@@ -113,7 +113,7 @@ paths:
       tags:
         - User
       summary: Logout All
-      description: Выход пользователя из всех сеансов.
+      description: Выход пользователя из всех других сеансов.
       operationId: logout_all_api_v1_logout_all_post
       requestBody:
         content:
@@ -181,6 +181,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HistoryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/user/{user_id}/roles:
+    get:
+      tags:
+        - User
+      summary: Users Roles
+      description: Все роли пользователя.
+      operationId: users_roles_api_v1_user__user_id__roles_get
+      parameters:
+        - required: true
+          schema:
+            title: User Id
+            type: string
+          name: user_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersRoleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/user/{user_id}/roles/add:
+    post:
+      tags:
+        - User
+      summary: Add Role For User
+      description: Добавить роль пользователю.
+      operationId: add_role_for_user_api_v1_user__user_id__roles_add_post
+      parameters:
+        - required: true
+          schema:
+            title: User Id
+            type: string
+          name: user_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleDataRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
         '422':
           description: Validation Error
           content:
@@ -425,11 +485,15 @@ components:
       title: LoginUserResData
       required:
         - login
+        - token
         - datetime
       type: object
       properties:
         login:
           title: Login
+          type: string
+        token:
+          title: Token
           type: string
         datetime:
           title: Datetime
@@ -573,6 +637,19 @@ components:
           title: Description
           type: string
       description: Роль пользователя.
+    RoleData:
+      title: RoleData
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
     RoleDataRequest:
       title: RoleDataRequest
       required:
@@ -624,6 +701,36 @@ components:
           items:
             $ref: '#/components/schemas/Role'
       description: Ответ на получения всех ролей.
+    UserRoleDataRequest:
+      title: UserRoleDataRequest
+      required:
+        - role_id
+      type: object
+      properties:
+        role_id:
+          title: Role Id
+          type: string
+      description: Запрос на добавления роли пользователю.
+    UsersRoleResponse:
+      title: UsersRoleResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          title: Data
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleData'
+      description: Ответ на получение ролей пользователя.
     ValidationError:
       title: ValidationError
       required:
