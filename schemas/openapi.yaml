@@ -1,0 +1,605 @@
+openapi: 3.0.2
+info:
+  title: Auth
+  description: Авторизация пользователей
+  version: 0.1.0
+paths:
+  /api/v1/registration:
+    post:
+      tags:
+        - User
+      summary: Registration
+      description: Регистрация пользователя.
+      operationId: registration_api_v1_registration_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegUserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/login:
+    post:
+      tags:
+        - User
+      summary: Login
+      description: Вход пользователя.
+      operationId: login_api_v1_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginUserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/logout:
+    post:
+      tags:
+        - User
+      summary: Logout
+      description: Выход пользователя.
+      operationId: logout_api_v1_logout_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutUser'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/logout_all:
+    post:
+      tags:
+        - User
+      summary: Logout All
+      description: Выход пользователя из всех сеансов.
+      operationId: logout_all_api_v1_logout_all_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutAllUser'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/refresh:
+    post:
+      tags:
+        - User
+      summary: Refresh
+      description: Обновить токен.
+      operationId: refresh_api_v1_refresh_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/user/{user_id}/history:
+    get:
+      tags:
+        - User
+      summary: History
+      description: История входа в систему.
+      operationId: history_api_v1_user__user_id__history_get
+      parameters:
+        - required: true
+          schema:
+            title: User Id
+            type: string
+          name: user_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/roles:
+    get:
+      tags:
+        - Role
+      summary: Roles
+      description: Все роли.
+      operationId: roles_api_v1_roles_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolesResponse'
+    post:
+      tags:
+        - Role
+      summary: Create Role
+      description: Создать роль.
+      operationId: create_role_api_v1_roles_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleDataRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRoleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/roles/{role_id}:
+    get:
+      tags:
+        - Role
+      summary: Role
+      description: Информация о роли.
+      operationId: role_api_v1_roles__role_id__get
+      parameters:
+        - required: true
+          schema:
+            title: Role Id
+            type: string
+          name: role_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+        - Role
+      summary: Edit Role
+      description: Изменить роль.
+      operationId: edit_role_api_v1_roles__role_id__put
+      parameters:
+        - required: true
+          schema:
+            title: Role Id
+            type: string
+          name: role_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleDataRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Role
+      summary: Delete Role
+      description: Удалить роль.
+      operationId: delete_role_api_v1_roles__role_id__delete
+      parameters:
+        - required: true
+          schema:
+            title: Role Id
+            type: string
+          name: role_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    BaseResponse:
+      title: BaseResponse
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+    CreateRoleResponse:
+      title: CreateRoleResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          $ref: '#/components/schemas/Role'
+      description: Ответ на создание роли.
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    HistoryData:
+      title: HistoryData
+      required:
+        - ip
+        - datetime
+      type: object
+      properties:
+        ip:
+          title: Ip
+          anyOf:
+            - type: string
+              format: ipv4
+            - type: string
+              format: ipv6
+        datetime:
+          title: Datetime
+          type: string
+          format: date-time
+    HistoryResponse:
+      title: HistoryResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          title: Data
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryData'
+      description: Ответ на получения истории входа.
+    LoginUserRequest:
+      title: LoginUserRequest
+      required:
+        - login
+        - password
+      type: object
+      properties:
+        login:
+          title: Login
+          type: string
+        password:
+          title: Password
+          type: string
+          format: password
+          writeOnly: true
+      description: Запрос на вход пользователя.
+    LoginUserResData:
+      title: LoginUserResData
+      required:
+        - login
+        - datetime
+      type: object
+      properties:
+        login:
+          title: Login
+          type: string
+        datetime:
+          title: Datetime
+          type: string
+          format: date-time
+      description: Запрос на вход пользователя.
+    LoginUserResponse:
+      title: LoginUserResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          $ref: '#/components/schemas/LoginUserResData'
+      description: Ответ на регистрацию пользователя.
+    LogoutAllUser:
+      title: LogoutAllUser
+      required:
+        - user_id
+      type: object
+      properties:
+        user_id:
+          title: User Id
+          type: string
+      description: Запрос на выход пользователя из всех сессий.
+    LogoutUser:
+      title: LogoutUser
+      required:
+        - refresh_token
+      type: object
+      properties:
+        refresh_token:
+          title: Refresh Token
+          type: string
+      description: Запрос на выход пользователя.
+    RefreshToken:
+      title: RefreshToken
+      required:
+        - user_id
+        - refresh_token
+      type: object
+      properties:
+        user_id:
+          title: User Id
+          type: string
+        refresh_token:
+          title: Refresh Token
+          type: string
+      description: Запрос на обновление токена.
+    RefreshTokenData:
+      title: RefreshTokenData
+      required:
+        - refresh_token
+        - access_token
+      type: object
+      properties:
+        refresh_token:
+          title: Refresh Token
+          type: string
+        access_token:
+          title: Access Token
+          type: string
+    RefreshTokenResponse:
+      title: RefreshTokenResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          $ref: '#/components/schemas/RefreshTokenData'
+      description: Ответ на обновление токена.
+    RegUserRequest:
+      title: RegUserRequest
+      required:
+        - login
+        - email
+        - password
+      type: object
+      properties:
+        login:
+          title: Login
+          type: string
+        email:
+          title: Email
+          type: string
+          format: email
+        password:
+          title: Password
+          type: string
+          format: password
+          writeOnly: true
+      description: Запрос на регистрацию пользователя.
+    RegUserResponse:
+      title: RegUserResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          $ref: '#/components/schemas/RegUserRequest'
+      description: Ответ на регистрацию пользователя.
+    Role:
+      title: Role
+      required:
+        - id
+        - name
+        - description
+      type: object
+      properties:
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+        description:
+          title: Description
+          type: string
+      description: Роль пользователя.
+    RoleDataRequest:
+      title: RoleDataRequest
+      required:
+        - name
+        - description
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+        description:
+          title: Description
+          type: string
+      description: Запрос на создание роли.
+    RoleResponse:
+      title: RoleResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          $ref: '#/components/schemas/Role'
+      description: Ответ на создание роли.
+    RolesResponse:
+      title: RolesResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          title: Data
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+      description: Ответ на получения всех ролей.
+    ValidationError:
+      title: ValidationError
+      required:
+        - loc
+        - msg
+        - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
