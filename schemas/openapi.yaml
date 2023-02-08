@@ -3,6 +3,8 @@ info:
   title: Auth
   description: Авторизация пользователей
   version: 0.1.0
+
+
 paths:
   /api/v1/registration:
     post:
@@ -34,6 +36,8 @@ paths:
     post:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: Change Password
       description: Смена пароля пользователя.
       operationId: change_password_api_v1_password_change_post
@@ -112,6 +116,8 @@ paths:
     post:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: Logout All
       description: Выход пользователя из всех других сеансов.
       operationId: logout_all_api_v1_logout_all_post
@@ -138,6 +144,8 @@ paths:
     post:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: Refresh
       description: Обновить токен.
       operationId: refresh_api_v1_refresh_post
@@ -164,6 +172,8 @@ paths:
     get:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: History
       description: История входа в систему.
       operationId: history_api_v1_user__user_id__history_get
@@ -191,6 +201,8 @@ paths:
     get:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: Users Roles
       description: Все роли пользователя.
       operationId: users_roles_api_v1_user__user_id__roles_get
@@ -218,6 +230,8 @@ paths:
     post:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: Add Role For User
       description: Добавить роль пользователю.
       operationId: add_role_for_user_api_v1_user__user_id__roles_add_post
@@ -251,6 +265,8 @@ paths:
     get:
       tags:
         - Role
+      security:
+        - bearerAuth: []
       summary: Roles
       description: Все роли.
       operationId: roles_api_v1_roles_get
@@ -264,6 +280,8 @@ paths:
     post:
       tags:
         - Role
+      security:
+        - bearerAuth: []
       summary: Create Role
       description: Создать роль.
       operationId: create_role_api_v1_roles_post
@@ -290,6 +308,8 @@ paths:
     get:
       tags:
         - Role
+      security:
+        - bearerAuth: []
       summary: Role
       description: Информация о роли.
       operationId: role_api_v1_roles__role_id__get
@@ -316,6 +336,8 @@ paths:
     put:
       tags:
         - Role
+      security:
+        - bearerAuth: []
       summary: Edit Role
       description: Изменить роль.
       operationId: edit_role_api_v1_roles__role_id__put
@@ -348,6 +370,8 @@ paths:
     delete:
       tags:
         - Role
+      security:
+        - bearerAuth: []
       summary: Delete Role
       description: Удалить роль.
       operationId: delete_role_api_v1_roles__role_id__delete
@@ -372,6 +396,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Заголовок авторизации JWT с использованием схемы Bearer.
+      bearerFormat: JWT  # optional, for documentation purposes only
   schemas:
     BaseResponse:
       title: BaseResponse
@@ -422,11 +452,21 @@ components:
       title: HTTPValidationError
       type: object
       properties:
-        detail:
-          title: Detail
+        success:
+          title: success
+          type: boolean
+          default: false
+        error:
+          title: error
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
+        data:
+          title: data
+          type: array
+          items:
+            type: string
+          example: []
     HistoryData:
       title: HistoryData
       required:
