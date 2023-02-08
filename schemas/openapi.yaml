@@ -30,6 +30,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/password/change:
+    post:
+      tags:
+        - User
+      summary: Change Password
+      description: Смена пароля пользователя.
+      operationId: change_password_api_v1_password_change_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/login:
     post:
       tags:
@@ -299,6 +325,22 @@ components:
           title: Error
           type: string
           default: ''
+    ChangePasswordUserRequest:
+      title: ChangePasswordUserRequest
+      required:
+        - user_id
+        - new_password
+      type: object
+      properties:
+        user_id:
+          title: User Id
+          type: string
+        new_password:
+          title: New Password
+          type: string
+          format: password
+          writeOnly: true
+      description: Запрос на смену пароля.
     CreateRoleResponse:
       title: CreateRoleResponse
       required:
