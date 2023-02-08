@@ -1,5 +1,5 @@
 from loguru import logger as loguru_logger
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, PostgresDsn
 
 logger = loguru_logger
 
@@ -11,7 +11,7 @@ class PrimaryConfig:
 
 class FlaskSettings(BaseSettings):
     """Настройки flask."""
-    secret_key: str
+    secret_key: str = Field(repr=False)
     debug: bool = Field(default=False)
 
     class Config(PrimaryConfig):
@@ -20,30 +20,13 @@ class FlaskSettings(BaseSettings):
 
 class PGSettings(BaseSettings):
     """Настройки postgres."""
-    dbname: str = Field(env='DB_NAME')
-    user: str
-    password: str = Field(repr=False)
-    host: str
-    port: int
-
-    def async_db_uri(self):
-        return (
-            f"postgresql+asyncpg://{self.user}:{self.password}"
-            f"@{self.host}:{self.port}/{self.dbname}"
-        )
-
-    def db_uri(self):
-        return (
-            f"postgresql://{self.user}:{self.password}"
-            f"@{self.host}:{self.port}/{self.dbname}"
-        )
+    DSN: PostgresDsn = Field(repr=False)
 
     class Config(PrimaryConfig):
-        env_prefix = 'DB_'
+        env_prefix = 'POSTGRES_'
 
 
 flask_settings = FlaskSettings()
 pg_settings = PGSettings()
 
 logger.debug(flask_settings)
-logger.debug(pg_settings)
