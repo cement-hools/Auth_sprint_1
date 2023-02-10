@@ -439,7 +439,7 @@ paths:
       security:
         - bearerAuth: []
       summary: Role check user
-      description: Принадлежность пользователя к роли роли.
+      description: Принадлежность пользователя к роли.
       operationId: role_api_v1_roles__check_user__get
       parameters:
         - required: true
