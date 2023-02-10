@@ -90,6 +90,8 @@ paths:
     post:
       tags:
         - User
+      security:
+        - bearerAuth: []
       summary: Logout
       description: Выход пользователя.
       operationId: logout_api_v1_logout_post
@@ -220,41 +222,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsersRoleResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/user/{user_id}/roles/add:
-    post:
-      tags:
-        - User
-      security:
-        - bearerAuth: []
-      summary: Add Role For User
-      description: Добавить роль пользователю.
-      operationId: add_role_for_user_api_v1_user__user_id__roles_add_post
-      parameters:
-        - required: true
-          schema:
-            title: User Id
-            type: string
-          name: user_id
-          in: path
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserRoleDataRequest'
-        required: true
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BaseResponse'
         '422':
           description: Validation Error
           content:
@@ -395,6 +362,106 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/roles/{role_id}/add_user:
+    post:
+      tags:
+        - Role
+      security:
+        - bearerAuth: []
+      summary: Add Role For User
+      description: Добавить роль пользователю.
+      operationId: add_role_for_user_api_v1_user__user_id__roles_add_post
+      parameters:
+        - required: true
+          schema:
+            title: Role Id
+            type: string
+          name: role_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleDataRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/roles/{role_id}/del_user:
+    post:
+      tags:
+        - Role
+      security:
+        - bearerAuth: []
+      summary: Delete Role For User
+      description: Убрать роль у пользователя.
+      operationId: del_role_for_user_api_v1_user__user_id__roles_add_post
+      parameters:
+        - required: true
+          schema:
+            title: Role Id
+            type: string
+          name: role_id
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRoleDataRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/roles/{role_id}/{user_id}/check:
+    get:
+      tags:
+        - Role
+      security:
+        - bearerAuth: []
+      summary: Role check user
+      description: Принадлежность пользователя к роли роли.
+      operationId: role_api_v1_roles__check_user__get
+      parameters:
+        - required: true
+          schema:
+            title: Role Id
+            type: string
+          name: role_id
+          in: path
+        - required: true
+          schema:
+            title: User Id
+            type: string
+          name: user_id
+          in: path
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleCheckUserResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -418,12 +485,12 @@ components:
     ChangePasswordUserRequest:
       title: ChangePasswordUserRequest
       required:
-        - user_id
+        - login
         - new_password
       type: object
       properties:
-        user_id:
-          title: User Id
+        login:
+          title: login
           type: string
         new_password:
           title: New Password
@@ -447,6 +514,26 @@ components:
           default: ''
         data:
           $ref: '#/components/schemas/Role'
+      description: Ответ на проверку принадлежности роли пользователю.
+    RoleCheckUserResponse:
+      title: RoleCheckUserResponse
+      required:
+        - data
+      type: object
+      properties:
+        success:
+          title: Success
+          type: boolean
+          default: true
+        error:
+          title: Error
+          type: string
+          default: ''
+        data:
+          title: Success
+          type: boolean
+          default: true
+
       description: Ответ на создание роли.
     HTTPValidationError:
       title: HTTPValidationError
@@ -462,10 +549,6 @@ components:
           items:
             $ref: '#/components/schemas/ValidationError'
         data:
-          title: data
-          type: array
-          items:
-            type: string
           example: []
     HistoryData:
       title: HistoryData
@@ -481,6 +564,8 @@ components:
               format: ipv4
             - type: string
               format: ipv6
+        user_agent:
+          title: user_agent
         datetime:
           title: Datetime
           type: string
@@ -560,11 +645,11 @@ components:
     LogoutAllUser:
       title: LogoutAllUser
       required:
-        - user_id
+        - login
       type: object
       properties:
-        user_id:
-          title: User Id
+        login:
+          title: Login
           type: string
       description: Запрос на выход пользователя из всех сессий.
     LogoutUser:
@@ -744,11 +829,11 @@ components:
     UserRoleDataRequest:
       title: UserRoleDataRequest
       required:
-        - role_id
+        - user_id
       type: object
       properties:
-        role_id:
-          title: Role Id
+        user_id:
+          title: User Id
           type: string
       description: Запрос на добавления роли пользователю.
     UsersRoleResponse:
