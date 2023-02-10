@@ -8,6 +8,6 @@ db = SQLAlchemy()
 def init_db(app: Flask):
     """Инициализация базы данных."""
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_DATABASE_URI"] = pg_settings.DSN
+    app.config["SQLALCHEMY_DATABASE_URI"] = pg_settings.dsn
     db.init_app(app)
     return db
