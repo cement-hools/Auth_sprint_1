@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from app.db import db, models
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_dantic import serialize
 from psycopg2 import errors
 from pydantic import ValidationError
