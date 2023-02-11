@@ -71,7 +71,25 @@ def create_role():
 @router.route("/roles/<string:role_id>", methods=["GET"])
 def detail_role(role_id: str):
     """Получение роли."""
-    return jsonify(message="detail_role!"), HTTPStatus.OK
+    logger.info("GET {}", request.path)
+    try:
+        role = models.Role.query.get(role_id)
+        logger.debug("role from DB: {}", role)
+        role_dict = serialize(role, RoleItem, json_dump=False)
+    except Exception as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = str(err)
+        return (
+            BaseResponse(success=False, error=error_message).dict(),
+        ), HTTPStatus.INTERNAL_SERVER_ERROR
+    logger.info("GET {} - OK", request.path)
+    if not role:
+        return (
+            BaseResponse(success=False, error="Role not found").dict(),
+            HTTPStatus.NOT_FOUND,
+        )
+    response_data = RoleItemResponse(data=role_dict)
+    return response_data.dict(), HTTPStatus.OK
 
 
 @router.route("/roles/<string:role_id>", methods=["PUT"])
