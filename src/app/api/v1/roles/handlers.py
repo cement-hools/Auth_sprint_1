@@ -82,20 +82,44 @@ def detail_role(role_id: str):
         return (
             BaseResponse(success=False, error=error_message).dict(),
         ), HTTPStatus.INTERNAL_SERVER_ERROR
-    logger.info("GET {} - OK", request.path)
     if not role:
         return (
             BaseResponse(success=False, error="Role not found").dict(),
             HTTPStatus.NOT_FOUND,
         )
     response_data = RoleItemResponse(data=role_dict)
+    logger.info("GET {} - OK", request.path)
     return response_data.dict(), HTTPStatus.OK
 
 
 @router.route("/roles/<string:role_id>", methods=["PUT"])
 def edit_role(role_id: str):
     """Редактирование роли."""
-    return jsonify(message="edit_role!"), HTTPStatus.OK
+    logger.info("PUT {}", request.path)
+    logger.debug("request: {}".format(request.json))
+    try:
+        body = CreateRoleRequest(**request.json)
+        role = models.Role.query.get(role_id)
+        role.name = body.name
+        role.description = body.description
+        db.session.commit()
+        role_dict = serialize(role, RoleItem, json_dump=False)
+    except ValidationError as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = err.errors()
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.BAD_REQUEST
+    except Exception as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = str(err)
+        return (
+            BaseResponse(success=False, error=error_message).dict(),
+        ), HTTPStatus.INTERNAL_SERVER_ERROR
+
+    response_data = RoleItemResponse(data=role_dict)
+    logger.info("PUT {} - OK", request.path)
+    return response_data.dict(), HTTPStatus.OK
 
 
 @router.route("/roles/<string:role_id>", methods=["DELETE"])
