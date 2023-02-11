@@ -4,8 +4,8 @@ services:
 
   redis_auth:
     ports:
-      - "6379:6379"
+      - "6379:6380"
 
   postgres_auth:
     ports:
-      - "5435:5435"
+      - "5432:5435"
