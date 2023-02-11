@@ -1,7 +1,8 @@
 from flask import Flask
-
+from flask_sqlalchemy import SQLAlchemy
 from settings import pg_settings
-from .models import db, Role
+
+db = SQLAlchemy()
 
 
 def init_db(app: Flask):
@@ -10,5 +11,12 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_DATABASE_URI"] = pg_settings.DSN
     db.init_app(app)
     with app.app_context():
+        from .models import Role
+
         db.create_all()
     return db
+
+
+def get_session():
+    """Возвращает сессию с базой данных."""
+    return db.session
