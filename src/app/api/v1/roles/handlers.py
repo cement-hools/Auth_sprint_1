@@ -23,13 +23,12 @@ def all_roles():
         logger.debug("serialized roles: {}", roles[:2])
     except Exception as err:
         logger.error("{}: {}", err.__class__.__name__, err)
-        return jsonify(
+        return (
             BaseResponse(success=False, error=str(err)).dict(),
-            HTTPStatus.INTERNAL_SERVER_ERROR,
-        )
+        ), HTTPStatus.INTERNAL_SERVER_ERROR
 
     response_data = RoleListResponse(data=roles)
-    return jsonify(response_data.dict(), HTTPStatus.OK)
+    return response_data.dict(), HTTPStatus.OK
 
 
 @router.route("/roles", methods=["POST"])
