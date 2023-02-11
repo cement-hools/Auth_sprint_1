@@ -1,13 +1,17 @@
 from http import HTTPStatus
 
-from app.db import db
-from app.db.models import Role
+from app.db import db, models
 from flask import Blueprint, jsonify, request
 from flask_dantic import serialize
+from psycopg2 import errors
+from pydantic import ValidationError
 from settings import logger
+from sqlalchemy.exc import IntegrityError
 
 from ..schemas import BaseResponse
-from .schemas import RoleListResponse, RoleScheme
+from .schemas import CreateRoleRequest, RoleItem, RoleItemResponse, RoleListResponse
+
+UniqueViolation = errors.lookup("23505")
 
 router = Blueprint("role", __name__)
 
@@ -17,14 +21,15 @@ def all_roles():
     """Список всех ролей."""
     logger.info("GET {}", request.path)
     try:
-        roles = Role.query.all()
+        roles = models.Role.query.all()
         logger.debug("roles from DB: {}", roles)
-        roles = serialize(roles, RoleScheme, many=True, json_dump=False)
+        roles = serialize(roles, RoleItem, many=True, json_dump=False)
         logger.debug("serialized roles: {}", roles[:2])
     except Exception as err:
         logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = str(err)
         return (
-            BaseResponse(success=False, error=str(err)).dict(),
+            BaseResponse(success=False, error=error_message).dict(),
         ), HTTPStatus.INTERNAL_SERVER_ERROR
 
     response_data = RoleListResponse(data=roles)
@@ -34,16 +39,33 @@ def all_roles():
 @router.route("/roles", methods=["POST"])
 def create_role():
     """Создание роли."""
-    logger.info("POST /roles")
+    logger.info("POST {}", request.path)
     logger.debug("request: {}".format(request.json))
-    name = request.json.get("name")
-    description = request.json.get("description")
-    role = Role(name=name, description=description)
-    logger.debug("role: {}".format(role.__dict__))
-    db.session.add(role)
-    db.session.commit()
+    try:
+        body = CreateRoleRequest(**request.json)
+
+        role = models.Role(**body.dict())
+        db.session.add(role)
+        db.session.commit()
+        role_dict = serialize(role, RoleItem, json_dump=False)
+    except ValidationError as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = err.errors()
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.BAD_REQUEST
+    except Exception as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = str(err)
+        if isinstance(err, IntegrityError) and isinstance(err.orig, UniqueViolation):
+            error_message = "Role with this name already exists"
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.INTERNAL_SERVER_ERROR
+    role_item = RoleItem(**role_dict)
+    response_data = RoleItemResponse(data=role_item)
     logger.info("POST /roles - OK")
-    return jsonify(role), HTTPStatus.OK
+    return response_data.dict(), HTTPStatus.OK
 
 
 @router.route("/roles/<string:role_id>", methods=["GET"])
@@ -52,13 +74,15 @@ def detail_role(role_id: str):
     return jsonify(message="detail_role!"), HTTPStatus.OK
 
 
-@router.route("/roles/string:<role_id>", methods=["PUT"])
+@router.route("/roles/<string:role_id>", methods=["PUT"])
 def edit_role(role_id: str):
     """Редактирование роли."""
     return jsonify(message="edit_role!"), HTTPStatus.OK
 
 
-@router.route("/roles/str:<role_id>", methods=["DELETE"])
+@router.route("/roles/<string:role_id>", methods=["DELETE"])
 def delete_role(role_id: str):
     """Удаление роли."""
+    db.session.delete(models.Role.query.get(role_id))
+    db.session.commit()
     return jsonify(message="delete_role!"), HTTPStatus.OK

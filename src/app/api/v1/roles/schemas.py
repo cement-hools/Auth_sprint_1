@@ -4,7 +4,7 @@ from app.api.v1.schemas import BaseResponse
 from pydantic import BaseModel
 
 
-class RoleScheme(BaseModel):
+class RoleItem(BaseModel):
     """Роль."""
 
     id: uuid.UUID
@@ -12,8 +12,8 @@ class RoleScheme(BaseModel):
     description: str
 
 
-class RoleListRequest(BaseModel):
-    """Запрос всех ролей."""
+class CreateRoleRequest(BaseModel):
+    """Запрос на создание роли."""
 
     name: str
     description: str
@@ -22,4 +22,10 @@ class RoleListRequest(BaseModel):
 class RoleListResponse(BaseResponse):
     """Ответ на запрос всех ролей."""
 
-    data: list[RoleScheme]
+    data: list[RoleItem]
+
+
+class RoleItemResponse(BaseResponse):
+    """Ответ с информацией о роли."""
+
+    data: RoleItem
