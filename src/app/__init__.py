@@ -1,6 +1,6 @@
 from flask import Flask
-from settings import flask_settings
 
+from settings import flask_settings
 from .api import v1
 from .db import init_db
 
@@ -11,8 +11,6 @@ def create_app():
 
     app.register_blueprint(v1.bp)
 
-    db = init_db(app)
-    app.app_context().push()
-    db.create_all()
+    init_db(app)
 
     return app

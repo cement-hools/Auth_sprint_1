@@ -1,8 +1,7 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from settings import pg_settings
 
-db = SQLAlchemy()
+from settings import pg_settings
+from .models import db, Role
 
 
 def init_db(app: Flask):
@@ -10,4 +9,6 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_DATABASE_URI"] = pg_settings.DSN
     db.init_app(app)
+    with app.app_context():
+        db.create_all()
     return db
