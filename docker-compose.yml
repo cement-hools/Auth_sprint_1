@@ -27,7 +27,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
       - ./tests/functional/test_data/create_data.sql:/docker-entrypoint-initdb.d/create_data.sql
     ports:
-      - "5432"
+      - "5435"
     env_file:
       - .env
     restart: unless-stopped
