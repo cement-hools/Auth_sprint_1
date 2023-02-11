@@ -1,3 +1,4 @@
+from dotenv import find_dotenv
 from loguru import logger as loguru_logger
 from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn
 
@@ -5,7 +6,10 @@ logger = loguru_logger
 
 
 class PrimaryConfig:
-    env_file = "../.env.example", "../.env.dev", ".env"
+    env_file = [
+        find_dotenv(filename=".env"),
+        find_dotenv(filename=".env.local"),  # Has more priority, if found
+    ]
     env_file_encoding = "utf-8"
 
 
