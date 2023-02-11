@@ -6,7 +6,7 @@ from flask_dantic import serialize
 from psycopg2 import errors
 from pydantic import ValidationError
 from settings import logger
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from ..schemas import BaseResponse
 from .schemas import CreateRoleRequest, RoleItem, RoleItemResponse, RoleListResponse
@@ -125,6 +125,24 @@ def edit_role(role_id: str):
 @router.route("/roles/<string:role_id>", methods=["DELETE"])
 def delete_role(role_id: str):
     """Удаление роли."""
-    db.session.delete(models.Role.query.get(role_id))
-    db.session.commit()
-    return jsonify(message="delete_role!"), HTTPStatus.OK
+    logger.info("DELETE {}", request.path)
+    try:
+        role = models.Role.query.get(role_id)
+        if not role:
+            raise NoResultFound("Role not found")
+        db.session.delete(role)
+        db.session.commit()
+    except NoResultFound as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = str(err)
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.NOT_FOUND
+    except Exception as err:
+        logger.error("{}: {}", err.__class__.__name__, err)
+        error_message = str(err)
+        return (
+            BaseResponse(success=False, error=error_message).dict(),
+        ), HTTPStatus.INTERNAL_SERVER_ERROR
+    logger.info("DELETE {} - OK", request.path)
+    return BaseResponse(success=True).dict(), HTTPStatus.OK
