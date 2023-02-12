@@ -8,8 +8,11 @@ logger = loguru_logger
 class PrimaryConfig:
     env_file = [
         find_dotenv(filename=".env"),
-        find_dotenv(filename=".env.local"),  # Has more priority, if found
+        find_dotenv(filename=".env.dev"),  # Has more priority, if found
     ]
+    # TODO: При локальном запуске, SQLAlchemy/psycopg2 берет dsn из .env все равно, даже если если есть .env.dev.
+    # Это не проблема конфига выше, он работает как ожидается и на вход init_db уходит dsn из .env.dev.
+    # Даже если закомментировать здесь импорт .env, SQLAlchemy/psycopg2 все равно подтянет переменные из .env
     env_file_encoding = "utf-8"
 
 
