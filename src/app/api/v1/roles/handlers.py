@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from app.db import db, models
-from flask import Blueprint, request
+from flask import Blueprint, abort, request
 from flask_dantic import serialize
 from psycopg2 import errors
 from settings import logger
@@ -13,6 +13,8 @@ from .schemas import CreateRoleRequest, RoleItem, RoleItemResponse, RoleListResp
 UniqueViolation = errors.lookup("23505")
 
 router = Blueprint("role", __name__)
+
+ROLE_404_MESSAGE = "Role not found"
 
 
 @router.route("/roles", methods=["GET"])
@@ -55,15 +57,10 @@ def create_role():
 def detail_role(role_id: str):
     """Получение роли."""
     logger.info("GET {}", request.path)
-    role = models.Role.query.get(role_id)
+    role = db.get_or_404(models.Role, role_id, description=ROLE_404_MESSAGE)
     logger.debug("role from DB: {}", role)
     role_dict = serialize(role, RoleItem, json_dump=False)
 
-    if not role:
-        return (
-            BaseResponse(success=False, error="Role not found").dict(),
-            HTTPStatus.NOT_FOUND,
-        )
     response_data = RoleItemResponse(data=role_dict)
     logger.info("GET {} - OK", request.path)
     return response_data.dict(), HTTPStatus.OK
@@ -76,13 +73,8 @@ def edit_role(role_id: str):
     logger.info("PUT {}", request.path)
     logger.debug("request: {}".format(request.json))
     body = request.clean_body
-    role = models.Role.query.get(role_id)
-    if not role:
-        error_message = "Role not found"
-        logger.warning("id {}: {}", role_id, error_message)
-        return (
-            BaseResponse(success=False, error=error_message).dict()
-        ), HTTPStatus.NOT_FOUND
+    role = db.get_or_404(models.Role, role_id, description=ROLE_404_MESSAGE)
+
     role.name = body.name
     role.description = body.description
     db.session.commit()
@@ -97,13 +89,7 @@ def edit_role(role_id: str):
 def delete_role(role_id: str):
     """Удаление роли."""
     logger.info("DELETE {}", request.path)
-    role = models.Role.query.get(role_id)
-    if not role:
-        error_message = "Role not found"
-        logger.warning("id {}: {}", role_id, error_message)
-        return (
-            BaseResponse(success=False, error=error_message).dict()
-        ), HTTPStatus.NOT_FOUND
+    role = db.get_or_404(models.Role, role_id, description=ROLE_404_MESSAGE)
     db.session.delete(role)
     db.session.commit()
     logger.info("DELETE {} - OK", request.path)
