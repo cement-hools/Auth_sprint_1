@@ -30,7 +30,7 @@ def handle_exception(e):
 
 
 @bp.errorhandler(404)
-def page_not_found(e):
+def item_not_found(e):
     """Return JSON instead of HTML for 404 errors."""
     response = e.get_response()
     data = BaseResponse(success=False, error=e.description)
@@ -41,7 +41,7 @@ def page_not_found(e):
 
 @bp.errorhandler(422)
 def unprocessable_entity(e):
-    """Return JSON instead of HTML for 404 errors."""
+    """Return JSON instead of HTML for 422 errors."""
     response = e.get_response()
     data = BaseResponse(success=False, error=e.description)
     response.data = data.json()
