@@ -6,7 +6,7 @@ from flask_dantic import serialize
 from settings import logger
 
 from ..schemas import BaseResponse
-from ..utils import body_validator
+from ..utils import body_validator, get_body
 from .schemas import CreateRoleRequest, RoleItem, RoleItemResponse, RoleListResponse
 
 router = Blueprint("role", __name__)
@@ -27,12 +27,11 @@ def all_roles():
 
 
 @router.route("/roles", methods=["POST"])
-@body_validator(CreateRoleRequest)
 def create_role():
     """Создание роли."""
     logger.info("POST {}", request.path)
     logger.debug("request: {}", request.get_json())
-    body = request.clean_body
+    body = get_body(CreateRoleRequest)
     role_in_db = models.Role.query.filter_by(name=body.name)
     if role_in_db:
         error_message = "Role with this name already exists"

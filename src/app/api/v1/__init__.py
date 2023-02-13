@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
-from app.api.v1 import auth, roles
 from flask import Blueprint
 from werkzeug.exceptions import HTTPException
 
+from app.api.v1 import auth, roles
 from .schemas import BaseResponse
 
 bp = Blueprint("v1", __name__, url_prefix="/api/v1")
@@ -26,7 +26,7 @@ def handle_exception(e):
     data = BaseResponse(success=False, error=error_data)
     response.data = data.json()
     response.content_type = "application/json"
-    return response
+    return response, HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @bp.errorhandler(404)
@@ -37,3 +37,13 @@ def page_not_found(e):
     response.data = data.json()
     response.content_type = "application/json"
     return response, HTTPStatus.NOT_FOUND
+
+
+@bp.errorhandler(422)
+def unprocessable_entity(e):
+    """Return JSON instead of HTML for 404 errors."""
+    response = e.get_response()
+    data = BaseResponse(success=False, error=e.description)
+    response.data = data.json()
+    response.content_type = "application/json"
+    return response, HTTPStatus.UNPROCESSABLE_ENTITY
