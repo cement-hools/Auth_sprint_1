@@ -1,7 +1,5 @@
-import json
 from http import HTTPStatus
 
-import werkzeug
 from app.api.v1 import auth, roles
 from flask import Blueprint
 from werkzeug.exceptions import HTTPException
