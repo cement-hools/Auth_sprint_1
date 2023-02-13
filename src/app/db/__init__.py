@@ -15,8 +15,3 @@ def init_db(app: Flask):
 
         db.create_all()
     return db
-
-
-def get_session():
-    """Возвращает сессию с базой данных."""
-    return db.session
