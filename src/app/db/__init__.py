@@ -10,4 +10,13 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_DATABASE_URI"] = pg_settings.DSN
     db.init_app(app)
+    with app.app_context():
+        from .models import Role
+
+        db.create_all()
     return db
+
+
+def get_session():
+    """Возвращает сессию с базой данных."""
+    return db.session
