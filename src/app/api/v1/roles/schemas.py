@@ -1,7 +1,8 @@
 import uuid
 
-from app.api.v1.schemas import BaseResponse
 from pydantic import BaseModel
+
+from app.api.v1.schemas import BaseResponse
 
 
 class RoleItem(BaseModel):
@@ -17,6 +18,10 @@ class CreateRoleRequest(BaseModel):
 
     name: str
     description: str
+
+
+class UpdateRoleRequest(CreateRoleRequest):
+    """Запрос на изменение роли."""
 
 
 class RoleListResponse(BaseResponse):
