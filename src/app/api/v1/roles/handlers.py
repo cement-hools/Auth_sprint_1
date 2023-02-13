@@ -3,14 +3,11 @@ from http import HTTPStatus
 from app.db import db, models
 from flask import Blueprint, request
 from flask_dantic import serialize
-from psycopg2 import errors
 from settings import logger
 
 from ..schemas import BaseResponse
 from ..utils import body_validator
 from .schemas import CreateRoleRequest, RoleItem, RoleItemResponse, RoleListResponse
-
-UniqueViolation = errors.lookup("23505")
 
 router = Blueprint("role", __name__)
 
