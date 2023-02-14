@@ -6,6 +6,7 @@ from loguru import logger as loguru_logger
 from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn
 
 logger = loguru_logger
+logger.remove()
 
 
 def obfuscate_message(message: str):

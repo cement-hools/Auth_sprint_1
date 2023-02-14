@@ -16,12 +16,6 @@ class HistoryData(BaseModel):
     datetime: datetime_type = Field(..., title="Datetime")
 
 
-class HistoryResponse(BaseModel):
-    success: Optional[bool] = Field(True, title="Success")
-    error: Optional[str] = Field("", title="Error")
-    data: List[HistoryData] = Field(..., title="Data")
-
-
 class LoginUserRequest(BaseModel):
     login: str = Field(..., title="Login")
     password: SecretStr = Field(..., title="Password")
@@ -31,12 +25,6 @@ class LoginUserResData(BaseModel):
     login: str = Field(..., title="Login")
     token: str = Field(..., title="Token")
     datetime: datetime_type = Field(..., title="Datetime")
-
-
-class LoginUserResponse(BaseModel):
-    success: Optional[bool] = Field(True, title="Success")
-    error: Optional[str] = Field("", title="Error")
-    data: LoginUserResData
 
 
 class LogoutAllUser(BaseModel):
@@ -57,12 +45,6 @@ class RefreshTokenData(BaseModel):
     access_token: str = Field(..., title="Access Token")
 
 
-class RefreshTokenResponse(BaseModel):
-    success: Optional[bool] = Field(True, title="Success")
-    error: Optional[str] = Field("", title="Error")
-    data: RefreshTokenData
-
-
 class RegUserRequest(BaseModel):
     login: str = Field(..., title="Login")
     email: EmailStr = Field(..., title="Email")
@@ -78,9 +60,3 @@ class RegUserResponse(BaseModel):
 class RoleData(BaseModel):
     id: str = Field(..., title="Id")
     name: str = Field(..., title="Name")
-
-
-class UsersRoleResponse(BaseModel):
-    success: Optional[bool] = Field(True, title="Success")
-    error: Optional[str] = Field("", title="Error")
-    data: List[RoleData] = Field(..., title="Data")
