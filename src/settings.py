@@ -21,8 +21,8 @@ class FlaskSettings(BaseSettings):
 
     secret_key: str = Field(repr=False)
     debug: bool = Field(default=False)
-    host: str = "0.0.0.0"
-    port: int = 8000
+    host: str = Field(default="0.0.0.0")
+    port: int = Field(default=5000)
 
     class Config(PrimaryConfig):
         env_prefix = "FLASK_"
