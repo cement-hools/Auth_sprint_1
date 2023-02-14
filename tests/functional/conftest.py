@@ -1,5 +1,4 @@
 """Fixtures"""
-import asyncio
 
 import pytest
 

@@ -5,12 +5,16 @@ from flask_dantic import serialize
 
 from app.db import db, models
 from settings import logger
-from .schemas import (
-    CreateRoleRequest, RoleItem, RoleItemResponse,
-    RoleListResponse, UpdateRoleRequest
-)
+
 from ..schemas import BaseResponse
 from ..utils import get_body
+from .schemas import (
+    CreateRoleRequest,
+    RoleItem,
+    RoleItemResponse,
+    RoleListResponse,
+    UpdateRoleRequest,
+)
 
 router = Blueprint("role", __name__)
 

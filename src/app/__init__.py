@@ -1,6 +1,7 @@
 from flask import Flask
 
 from settings import flask_settings
+
 from .api import v1
 from .db import init_db
 
