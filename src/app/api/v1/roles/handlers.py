@@ -9,6 +9,7 @@ from settings import logger
 from ..schemas import BaseResponse
 from ..utils import get_body
 from .schemas import (
+    AddUserToRoleRequest,
     CreateRoleRequest,
     RoleItem,
     RoleItemResponse,
@@ -85,3 +86,25 @@ def delete_role(role_id: str):
     db.session.delete(role)
     db.session.commit()
     return BaseResponse(success=True).dict(), HTTPStatus.OK
+
+
+@router.route("/roles/<string:role_id>/add_user", methods=["POST"])
+def add_role_to_user(role_id: str):
+    """Добавление роли в пользователя."""
+    body: AddUserToRoleRequest = get_body(AddUserToRoleRequest)
+    user_id = body.user_id
+    user_role = models.UserRole.query.filter_by(
+        user_id=user_id, role_id=role_id
+    ).first()
+    if user_role:
+        error_message = "User already has this role"
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.BAD_REQUEST
+
+    role = db.get_or_404(models.Role, role_id, description=ROLE_404_MESSAGE)
+    user = db.get_or_404(models.User, user_id, description=ROLE_404_MESSAGE)
+    role.users.append(user)
+    db.session.commit()
+    response_data = BaseResponse()
+    return response_data.dict(), HTTPStatus.OK

@@ -24,6 +24,12 @@ class UpdateRoleRequest(CreateRoleRequest):
     """Запрос на изменение роли."""
 
 
+class AddUserToRoleRequest(BaseModel):
+    """Добавить пользователя в роль."""
+
+    user_id: uuid.UUID
+
+
 class RoleListResponse(BaseResponse):
     """Ответ на запрос всех ролей."""
 
