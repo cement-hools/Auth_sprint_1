@@ -1,5 +1,6 @@
-from app import create_app
 from gevent import monkey
+
+from app import create_app
 from settings import flask_settings
 
 monkey.patch_all()

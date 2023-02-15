@@ -7,4 +7,6 @@ class TestSettings(BaseSettings):
     api_v1_base_path: str = "/api/v1/"
 
 
-test_settings = TestSettings(_env_file=find_dotenv(), _env_file_encoding="utf-8")
+test_settings = TestSettings(
+    _env_file=find_dotenv(), _env_file_encoding="utf-8"
+)

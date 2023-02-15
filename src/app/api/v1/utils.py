@@ -1,6 +1,6 @@
 from typing import Type
 
-from flask import request, abort
+from flask import abort, request
 from pydantic import BaseModel, ValidationError
 
 from settings import logger
