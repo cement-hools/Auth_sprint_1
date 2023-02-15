@@ -3,7 +3,7 @@ Flask==2.2.2
 flask-dantic==0.0.6
 gevent==22.10.2
 loguru==0.6.0
-pydantic==1.10.4
+pydantic[email,dotenv]==1.10.4
 python-dotenv==0.21.1
 psycopg2-binary==2.9.5
 redis==4.5.1
