@@ -1,16 +1,19 @@
 from http import HTTPStatus
 
+from app.db import db, models
 from flask import Blueprint, request
 from flask_dantic import serialize
-
-from app.db import db, models
 from settings import logger
-from .schemas import (
-    CreateRoleRequest, RoleItem, RoleItemResponse,
-    RoleListResponse, UpdateRoleRequest
-)
+
 from ..schemas import BaseResponse
 from ..utils import get_body
+from .schemas import (
+    CreateRoleRequest,
+    RoleItem,
+    RoleItemResponse,
+    RoleListResponse,
+    UpdateRoleRequest,
+)
 
 router = Blueprint("role", __name__)
 
@@ -35,7 +38,7 @@ def create_role():
     logger.info("POST {}", request.path)
     logger.debug("request: {}", request.get_json())
     body: CreateRoleRequest = get_body(CreateRoleRequest)
-    role_in_db = models.Role.query.filter_by(name=body.name)
+    role_in_db = models.Role.query.filter_by(name=body.name).first()
     if role_in_db:
         error_message = "Role with this name already exists"
         return (

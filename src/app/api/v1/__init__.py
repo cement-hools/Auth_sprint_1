@@ -4,6 +4,7 @@ from flask import Blueprint
 from werkzeug.exceptions import HTTPException
 
 from app.api.v1 import auth, roles
+
 from .schemas import BaseResponse
 
 bp = Blueprint("v1", __name__, url_prefix="/api/v1")

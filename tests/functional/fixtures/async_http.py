@@ -1,4 +1,3 @@
-import asyncio
 from dataclasses import dataclass
 
 import aiohttp
@@ -28,9 +27,7 @@ def aiohttp_get(aiohttp_client_session):
         endpoint: str,
         query: dict = None,
     ):
-        url = (
-            f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
-        )
+        url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
         async with aiohttp_client_session.get(url, params=query) as response:
             body = await response.json()
             headers = response.headers
@@ -46,9 +43,7 @@ def aiohttp_post(aiohttp_client_session):
         endpoint: str,
         json: str,
     ):
-        url = (
-            f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
-        )
+        url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
         async with aiohttp_client_session.post(url, json=json) as response:
             body = await response.json()
             headers = response.headers
