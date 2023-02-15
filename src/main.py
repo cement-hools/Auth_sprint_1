@@ -1,6 +1,9 @@
 from app import create_app
 from app.api.v1.utils import after_request_log, before_request_log
+
 from gevent import monkey
+
+from app import create_app
 from settings import flask_settings
 
 monkey.patch_all()
