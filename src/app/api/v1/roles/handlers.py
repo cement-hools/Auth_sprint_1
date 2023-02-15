@@ -131,3 +131,21 @@ def delete_role_from_user(role_id: str):
     db.session.commit()
     response_data = BaseResponse()
     return response_data.dict(), HTTPStatus.OK
+
+
+@router.route(
+    "/roles/<string:role_id>/<string:user_id>/check", methods=["GET"]
+)
+def check_user_role(role_id: str, user_id: str):
+    """Проверка принадлежности пользователя к роли."""
+    user_role = models.UserRole.query.filter_by(
+        user_id=user_id, role_id=role_id
+    ).first()
+    logger.debug("user_role: {}", user_role)
+    if not user_role:
+        error_message = "User does not have this role"
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.BAD_REQUEST
+    response_data = BaseResponse()
+    return response_data.dict(), HTTPStatus.OK
