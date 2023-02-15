@@ -64,6 +64,7 @@ class UserRole(db.Model):
     """Связь пользователя и роли."""
 
     __tablename__ = "user_role"
+    __table_args__ = (db.UniqueConstraint("user_id", "role_id"),)
 
     id = db.Column(
         UUID(as_uuid=True),

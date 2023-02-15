@@ -9,6 +9,7 @@ from .db import init_db
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = flask_settings.secret_key
+    app.config["JSON_AS_ASCII"] = False
 
     app.register_blueprint(v1.bp)
 

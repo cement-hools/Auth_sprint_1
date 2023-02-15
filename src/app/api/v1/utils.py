@@ -2,6 +2,7 @@ from typing import Type
 
 from flask import abort, request
 from pydantic import BaseModel, ValidationError
+
 from settings import logger
 
 
@@ -23,5 +24,7 @@ def before_request_log():
 
 
 def after_request_log(response):
-    logger.debug(f"Response for {request.method} {request.path}: {response.data}")
+    logger.debug(
+        f"Response for {request.method} {request.path}: {response.get_json()}"
+    )
     return response
