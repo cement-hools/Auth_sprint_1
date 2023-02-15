@@ -11,6 +11,7 @@ from ..utils import get_body
 from .schemas import (
     AddUserToRoleRequest,
     CreateRoleRequest,
+    DeleteUserFromRoleRequest,
     RoleItem,
     RoleItemResponse,
     RoleListResponse,
@@ -105,6 +106,28 @@ def add_role_to_user(role_id: str):
     role = db.get_or_404(models.Role, role_id, description=ROLE_404_MESSAGE)
     user = db.get_or_404(models.User, user_id, description=ROLE_404_MESSAGE)
     role.users.append(user)
+    db.session.commit()
+    response_data = BaseResponse()
+    return response_data.dict(), HTTPStatus.OK
+
+
+@router.route("/roles/<string:role_id>/del_user", methods=["POST"])
+def delete_role_from_user(role_id: str):
+    """Удаление пользователя из роли."""
+    body: DeleteUserFromRoleRequest = get_body(DeleteUserFromRoleRequest)
+    user_id = body.user_id
+    user_role = models.UserRole.query.filter_by(
+        user_id=user_id, role_id=role_id
+    ).first()
+    if not user_role:
+        error_message = "User does not have this role"
+        return (
+            BaseResponse(success=False, error=error_message).dict()
+        ), HTTPStatus.BAD_REQUEST
+
+    role = db.get_or_404(models.Role, role_id, description=ROLE_404_MESSAGE)
+    user = db.get_or_404(models.User, user_id, description=ROLE_404_MESSAGE)
+    role.users.remove(user)
     db.session.commit()
     response_data = BaseResponse()
     return response_data.dict(), HTTPStatus.OK

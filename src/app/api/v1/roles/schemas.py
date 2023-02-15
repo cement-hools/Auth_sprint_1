@@ -30,6 +30,10 @@ class AddUserToRoleRequest(BaseModel):
     user_id: uuid.UUID
 
 
+class DeleteUserFromRoleRequest(AddUserToRoleRequest):
+    """Удалить пользователя из роли."""
+
+
 class RoleListResponse(BaseResponse):
     """Ответ на запрос всех ролей."""
 
