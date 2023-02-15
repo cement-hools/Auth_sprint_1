@@ -1,7 +1,8 @@
 import uuid
 
-from app.db import db
 from sqlalchemy import UUID
+
+from app.db import db
 
 
 class User(db.Model):
@@ -21,11 +22,13 @@ class User(db.Model):
         db.String, unique=True, nullable=False, comment="Логин пользователя"
     )
     email = db.Column(db.String, nullable=False, comment="email Пользователя")
-    password = db.Column(db.String, nullable=False, comment="Пароль Пользователя")
-    login_history = db.relationship(
-        "LoginHistory", backref="user", comment="История входа"
+    password = db.Column(
+        db.String, nullable=False, comment="Пароль Пользователя"
     )
-    roles = db.relationship("Role", secondary="user_role", back_populates="users")
+    login_history = db.relationship("LoginHistory", backref="user")
+    roles = db.relationship(
+        "Role", secondary="user_role", back_populates="users"
+    )
 
     def __repr__(self):
         return f"<User: {self.login}>"
@@ -46,8 +49,12 @@ class LoginHistory(db.Model):
     )
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey(User.id))
     ip = db.Column(db.String, nullable=False, comment="IP пользователя")
-    user_agent = db.Column(db.String, nullable=False, comment="User-Agent пользователя")
-    datetime = db.Column(db.DateTime, nullable=False, comment="Дата и время входа")
+    user_agent = db.Column(
+        db.String, nullable=False, comment="User-Agent пользователя"
+    )
+    datetime = db.Column(
+        db.DateTime, nullable=False, comment="Дата и время входа"
+    )
 
     def __repr__(self):
         return f"<LoginHistory: (User: {self.user_id}, {self.datetime}>"
