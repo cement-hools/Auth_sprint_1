@@ -12,7 +12,7 @@ def init_db(app: Flask):
     app.config["SQLALCHEMY_DATABASE_URI"] = pg_settings.dsn
     db.init_app(app)
     with app.app_context():
-        from .models import Role
+        from .models import JWTStore, Role, User
 
         db.create_all()
     return db

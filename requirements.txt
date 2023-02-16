@@ -6,5 +6,7 @@ loguru==0.6.0
 pydantic[email,dotenv]==1.10.4
 python-dotenv==0.21.1
 psycopg2-binary==2.9.5
-redis==4.5.1
+flask_redis==0.4
 pre-commit==3.0.4
+flask-jwt-extended==4.4.4
+flask_bcrypt==1.0.1

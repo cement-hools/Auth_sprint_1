@@ -11,12 +11,15 @@ logger.remove()
 
 def obfuscate_message(message: str):
     """Obfuscate sensitive information."""
-    result = re.sub(r"'password': '.*'", "'password': [obfuscated]", message)
+    result = re.sub(r"password': '.*?'", "password': [obfuscated]", message)
+    result = re.sub(r'token": ".*?"', 'token": [obfuscated]', message)
     return result
 
 
 def formatter(record):
-    record["extra"]["obfuscated_message"] = obfuscate_message(record["message"])
+    record["extra"]["obfuscated_message"] = obfuscate_message(
+        record["message"]
+    )
     return "[{level}] {extra[obfuscated_message]}\n{exception}"
 
 
@@ -46,6 +49,17 @@ class FlaskSettings(BaseSettings):
         env_prefix = "FLASK_"
 
 
+class JWTSettings(BaseSettings):
+    """Настройки JWT."""
+
+    secret_key: str = Field(repr=False)
+    access_token_expires_hours: int = Field(default=1)
+    refresh_token_expires_days: int = Field(default=30)
+
+    class Config(PrimaryConfig):
+        env_prefix = "JWT_"
+
+
 class PGSettings(BaseSettings):
     """Настройки postgres."""
 
@@ -65,6 +79,7 @@ class RedisSettings(BaseSettings):
 
 
 flask_settings = FlaskSettings()
+jwt_settings = JWTSettings()
 pg_settings = PGSettings()
 redis_settings = RedisSettings()
 

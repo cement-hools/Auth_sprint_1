@@ -14,8 +14,10 @@ services:
 
   redis_auth:
     image: redis:6.2.6
+    volumes:
+      - redis_data:/data
     command: >
-      --requirepass ${REDIS_PASSWORD}
+      --requirepass ${REDIS_PASSWORD} --appendonly yes
     ports:
       - "6379"
     env_file:
@@ -34,3 +36,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
