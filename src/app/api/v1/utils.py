@@ -2,6 +2,7 @@ from typing import Type
 
 from flask import abort, request
 from pydantic import BaseModel, ValidationError
+
 from settings import logger
 
 
@@ -19,9 +20,16 @@ def get_body(request_model: Type[BaseModel]):
 
 def before_request_log():
     logger.info(f"{request.method}: {request.path}")
-    logger.debug(f"{request.args}\n{request.get_json()}")
+    logger.debug(f"{request.args}")
+    if (
+        request.content_type == "application/json"
+        and int(request.headers.get("Content-Length")) > 0
+    ):
+        logger.debug(f"{request.get_json()}")
 
 
 def after_request_log(response):
-    logger.debug(f"Response for {request.method} {request.path}: {response.data}")
+    logger.debug(
+        f"Response for {request.method} {request.path}: {response.data}"
+    )
     return response

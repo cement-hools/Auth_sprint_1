@@ -1,16 +1,16 @@
 from datetime import datetime as datetime_type
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Field, SecretStr
+from pydantic import UUID4, BaseModel, EmailStr, Field, validator
 
 
 class ChangePasswordUserRequest(BaseModel):
-    login: str = Field(..., title="login")
-    new_password: SecretStr = Field(..., title="New Password")
+    old_password: str = Field(..., title="Old Password")
+    new_password: str = Field(..., title="New Password")
 
 
-class HistoryData(BaseModel):
+class LoginHistoryData(BaseModel):
     ip: Union[IPv4Address, IPv6Address] = Field(..., title="Ip")
     user_agent: Optional[Any] = Field(None, title="user_agent")
     datetime: datetime_type = Field(..., title="Datetime")
@@ -18,45 +18,35 @@ class HistoryData(BaseModel):
 
 class LoginUserRequest(BaseModel):
     login: str = Field(..., title="Login")
-    password: SecretStr = Field(..., title="Password")
+    password: str = Field(..., title="Password")
 
 
 class LoginUserResData(BaseModel):
-    login: str = Field(..., title="Login")
-    token: str = Field(..., title="Token")
-    datetime: datetime_type = Field(..., title="Datetime")
-
-
-class LogoutAllUser(BaseModel):
-    login: str = Field(..., title="Login")
+    access_token: str = Field(..., title="Access token")
+    access_token_expiration_date: datetime_type = Field(
+        ..., title="Access token expiration datetime"
+    )
+    refresh_token: str = Field(..., title="Refresh token")
+    refresh_token_expiration_date: datetime_type = Field(
+        ..., title="Refresh token expiration datetime"
+    )
 
 
 class LogoutUser(BaseModel):
     refresh_token: str = Field(..., title="Refresh Token")
 
 
-class RefreshToken(BaseModel):
-    user_id: str = Field(..., title="User Id")
-    refresh_token: str = Field(..., title="Refresh Token")
-
-
-class RefreshTokenData(BaseModel):
-    refresh_token: str = Field(..., title="Refresh Token")
-    access_token: str = Field(..., title="Access Token")
-
-
 class RegUserRequest(BaseModel):
     login: str = Field(..., title="Login")
     email: EmailStr = Field(..., title="Email")
-    password: SecretStr = Field(..., title="Password")
+    password: str = Field(..., title="Password")
 
-
-class RegUserResponse(BaseModel):
-    success: Optional[bool] = Field(True, title="Success")
-    error: Optional[str] = Field("", title="Error")
-    data: RegUserRequest
+    @validator("login")
+    def login_alphanumeric(cls, v):
+        assert v.isalnum(), "must be alphanumeric"
+        return v
 
 
 class RoleData(BaseModel):
-    id: str = Field(..., title="Id")
+    id: UUID4 = Field(..., title="Id")
     name: str = Field(..., title="Name")
