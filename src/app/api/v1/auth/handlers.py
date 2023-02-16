@@ -191,12 +191,8 @@ def user_roles_list():
     """
     User roles list.
     """
-    user_roles = models.UserRole.query.filter_by(user_id=current_user.id).all()
-    user_roles_ids = [ur.role_id for ur in user_roles]
-    roles = models.Role.query.filter(models.Role.id.in_(user_roles_ids)).all()
-
     data: list[RoleData] = []
-    for role in roles:
+    for role in current_user.roles:
         data.append(RoleData(id=role.id, name=role.name))
 
     return BaseResponse(data=data).json(), HTTPStatus.OK
