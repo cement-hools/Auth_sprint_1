@@ -30,6 +30,6 @@ def before_request_log():
 
 def after_request_log(response):
     logger.debug(
-        f"Response for {request.method} {request.path}: {response.data}"
+        f"Response for {request.method} {request.path}: {response.get_json()}"
     )
     return response
