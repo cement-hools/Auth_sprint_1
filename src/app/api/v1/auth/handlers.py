@@ -68,8 +68,9 @@ def password_change():
             BaseResponse(success=False, error=error_message).dict()
         ), HTTPStatus.UNAUTHORIZED
 
+    jwt_tokens = create_access_and_refresh_jwt(current_user)
     return (
-        BaseResponse(data=create_access_and_refresh_jwt(current_user)).json(),
+        BaseResponse(data=jwt_tokens).json(),
         HTTPStatus.OK,
     )
 
@@ -99,8 +100,9 @@ def login():
         )
     )
     db.session.commit()
+    jwt_tokens = create_access_and_refresh_jwt(user)
     return (
-        BaseResponse(data=create_access_and_refresh_jwt(user)).json(),
+        BaseResponse(data=jwt_tokens).json(),
         HTTPStatus.OK,
     )
 
@@ -161,8 +163,10 @@ def refresh():
         db.session.commit()
     invalidate_jwt(old_refresh_token_jti, "refresh")
 
+    jwt_tokens = create_access_and_refresh_jwt(current_user)
+
     return (
-        BaseResponse(data=create_access_and_refresh_jwt(current_user)).json(),
+        BaseResponse(data=jwt_tokens).json(),
         HTTPStatus.OK,
     )
 
