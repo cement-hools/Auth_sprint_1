@@ -10,3 +10,4 @@ flask_redis==0.4
 pre-commit==3.0.4
 flask-jwt-extended==4.4.4
 flask_bcrypt==1.0.1
+click==8.1.3

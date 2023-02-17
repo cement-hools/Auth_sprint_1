@@ -1,6 +1,14 @@
 
 
 
+## Run yourself
+
+### Create users
+While app is running you can create users like so:
+```
+make user args="superman super@example.com p@ssword --admin"
+```
+
 ## Development
 ### Pre-commit hooks
 * pip install pre-commit from requirements.txt
