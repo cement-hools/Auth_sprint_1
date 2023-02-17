@@ -7,7 +7,9 @@ from pydantic import UUID4, BaseModel, EmailStr, Field, validator
 
 class ChangePasswordUserRequest(BaseModel):
     old_password: str = Field(..., title="Old Password")
-    new_password: str = Field(..., title="New Password")
+    new_password: str = Field(
+        ..., title="New Password", min_length=6, max_length=72
+    )
 
 
 class LoginHistoryData(BaseModel):
@@ -18,7 +20,7 @@ class LoginHistoryData(BaseModel):
 
 class LoginUserRequest(BaseModel):
     login: str = Field(..., title="Login")
-    password: str = Field(..., title="Password")
+    password: str = Field(..., title="Password", min_length=6, max_length=72)
 
 
 class LoginUserResData(BaseModel):
@@ -39,7 +41,7 @@ class LogoutUser(BaseModel):
 class RegUserRequest(BaseModel):
     login: str = Field(..., title="Login")
     email: EmailStr = Field(..., title="Email")
-    password: str = Field(..., title="Password")
+    password: str = Field(..., title="Password", min_length=6, max_length=72)
 
     @validator("login")
     def login_alphanumeric(cls, v):
