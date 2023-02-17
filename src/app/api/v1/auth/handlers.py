@@ -41,7 +41,7 @@ def registration():
     db.session.add(user)
     db.session.commit()
 
-    return BaseResponse(success=True, error="").json(), HTTPStatus.OK
+    return BaseResponse(success=True, error="").dict(), HTTPStatus.OK
 
 
 @router.route("/password_change", methods=["POST"])
