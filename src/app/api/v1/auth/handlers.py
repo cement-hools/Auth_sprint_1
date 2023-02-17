@@ -83,11 +83,14 @@ def login():
     body: LoginUserRequest = get_body(LoginUserRequest)
 
     user = models.User.query.filter_by(login=body.login).one_or_none()
-    if not user or not user.verify_password(body.password):
+    if not user:
         return (
-            BaseResponse(
-                success=False, error="Wrong username or password"
-            ).json(),
+            BaseResponse(success=False, error="Wrong username").dict(),
+            HTTPStatus.UNAUTHORIZED,
+        )
+    if not user.verify_password(body.password):
+        return (
+            BaseResponse(success=False, error="password").dict(),
             HTTPStatus.UNAUTHORIZED,
         )
 
@@ -102,7 +105,7 @@ def login():
     db.session.commit()
     jwt_tokens = create_access_and_refresh_jwt(user)
     return (
-        BaseResponse(data=jwt_tokens).json(),
+        BaseResponse(data=jwt_tokens).dict(),
         HTTPStatus.OK,
     )
 
