@@ -3,6 +3,7 @@ from http import HTTPStatus
 from flask import Blueprint
 from flask_dantic import serialize
 
+from app.api.v1.roles_authorization import requires_admin
 from app.db import db, models
 from settings import logger
 
@@ -21,6 +22,10 @@ from .schemas import (
 router = Blueprint("role", __name__)
 
 ROLE_404_MESSAGE = "Role not found"
+
+router.before_request(
+    requires_admin
+)  # Admin role required for all routes in this blueprint
 
 
 @router.route("/roles", methods=["GET"])
