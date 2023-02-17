@@ -32,7 +32,7 @@ def aiohttp_get(aiohttp_client_session):
             body = await response.json()
             headers = response.headers
             status = response.status
-        return HTTPResponse(status=status, headers=headers, body=body)
+        return HTTPResponse(status=status, headers=headers, body=body.dict())
 
     return inner
 
@@ -41,10 +41,14 @@ def aiohttp_get(aiohttp_client_session):
 def aiohttp_post(aiohttp_client_session):
     async def inner(
         endpoint: str,
-        json: str,
+        json: str = None,
+        token: str = None,
     ):
         url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
-        async with aiohttp_client_session.post(url, json=json) as response:
+        headers = {"Authorization": f"bearer {token}"}
+        async with aiohttp_client_session.post(
+            url, json=json, headers=headers
+        ) as response:
             body = await response.json()
             headers = response.headers
             status = response.status
