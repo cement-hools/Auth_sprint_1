@@ -78,9 +78,19 @@ class RedisSettings(BaseSettings):
         env_prefix = "REDIS_"
 
 
+class UserRoles(BaseSettings):
+    """Setting up basic app roles uuids"""
+
+    uuids = {
+        "admin": "9b751230-c16b-40af-8732-2f0c20961a04",
+        "user": "1ac6344c-bb0f-4903-9d2e-9fe182ea7132",
+    }
+
+
 flask_settings = FlaskSettings()
 jwt_settings = JWTSettings()
 pg_settings = PGSettings()
 redis_settings = RedisSettings()
+user_roles_settings = UserRoles()
 
 logger.debug(flask_settings)
