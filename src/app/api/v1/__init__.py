@@ -4,6 +4,7 @@ from flask import Blueprint
 from werkzeug.exceptions import HTTPException
 
 from app.api.v1 import auth, roles
+from app.jwt_app import jwt
 
 from .schemas import BaseResponse
 
@@ -48,3 +49,11 @@ def unprocessable_entity(e):
     response.data = data.json()
     response.content_type = "application/json"
     return response, HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return (
+        BaseResponse(success=False, error="Expired token").dict(),
+        HTTPStatus.UNAUTHORIZED,
+    )
