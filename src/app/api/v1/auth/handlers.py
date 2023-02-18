@@ -110,7 +110,7 @@ def login():
     )
 
 
-@router.route("/logout", methods=["DELETE"])
+@router.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
     """
