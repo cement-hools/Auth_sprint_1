@@ -3,6 +3,7 @@ from datetime import timedelta
 from flask import Flask
 
 from app.jwt_app import jwt, jwt_redis_blocklist
+from cli_commands import create_user
 from settings import flask_settings, jwt_settings, redis_settings
 
 
@@ -22,10 +23,11 @@ def create_app():
     jwt_redis_blocklist.init_app(app, decode_responses=True)
     jwt.init_app(app)
 
-
     app.register_blueprint(v1.bp)
 
     init_db(app)
+
+    app.cli.add_command(create_user)
 
     return app
 
