@@ -53,6 +53,12 @@ def user(register_user):
 
 
 @pytest.fixture
+def user_logined(user, login_user):
+    response = login_user(USER["login"], USER["password"])
+    return response
+
+
+@pytest.fixture
 def login_user(http_post):
     def inner(login, password):
         endpoint = "login"
@@ -63,6 +69,15 @@ def login_user(http_post):
     return inner
 
 
+@pytest.fixture
+def logout_user(http_post):
+    def inner(refresh_token, token):
+        endpoint = "logout"
+        payload = {"refresh_token": refresh_token}
+        response = http_post(endpoint, payload, token)
+        return response
+
+    return inner
 @pytest.mark.parametrize(
     "login, email, password, response_status, success",
     [
@@ -141,3 +156,21 @@ def test_login(
     response = login_user(login, password)
     assert response.status == response_status
     assert response.body.get("success") == success
+
+
+@pytest.mark.parametrize(
+    "refresh_token, token, response_status, success",
+    [
+        ("validlogin", "valid password", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        (USER["login"], USER["password"], HTTPStatus.OK, True),
+    ],
+)
+def test_logout(
+    refresh_token, token, response_status, success, user_logined, logout_user
+) -> None:
+
+    if success:
+        refresh_token = user_logined.body["data"].get("refresh_token")
+        token = user_logined.body["data"].get("access_token")
+    response = logout_user(refresh_token, token)
+    assert response.status == response_status
