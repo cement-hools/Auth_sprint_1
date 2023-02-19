@@ -78,6 +78,20 @@ def logout_user(http_post):
         return response
 
     return inner
+
+@pytest.fixture
+def password_change(http_post):
+    def inner(old_password, new_password):
+        endpoint = "password_change"
+        payload = {
+            "old_password": USER["password"],
+            "new_password": "new_valid_password"
+        }
+        response = http_post(endpoint, payload, token)
+        return response
+
+    return inner
+
 @pytest.mark.parametrize(
     "login, email, password, response_status, success",
     [
@@ -174,3 +188,26 @@ def test_logout(
         token = user_logined.body["data"].get("access_token")
     response = logout_user(refresh_token, token)
     assert response.status == response_status
+
+
+
+@pytest.mark.parametrize(
+    "old, new, response_status, success",
+    [
+        ("1234", "", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("1234", "sdhgxfdbnfhdfhfd", HTTPStatus.UNAUTHORIZED, False),
+        (USER["password"], "new_valid_password", HTTPStatus.OK, True),
+    ],
+)
+def test_password_change(
+    old, new, response_status, success, user_logined, http_post
+) -> None:
+    token = user_logined.body["data"].get("access_token")
+    endpoint = "password_change"
+    payload = {
+        "old_password": old,
+        "new_password": new
+    }
+    response = http_post(endpoint, payload, token)
+    assert response.status == response_status
+
