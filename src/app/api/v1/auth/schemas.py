@@ -12,10 +12,15 @@ class ChangePasswordUserRequest(BaseModel):
     )
 
 
-class LoginHistoryData(BaseModel):
+class LoginHistoryRow(BaseModel):
     ip: str = Field(..., title="Ip")
     user_agent: Optional[Any] = Field(None, title="user_agent")
     datetime: datetime_type = Field(..., title="Datetime")
+
+
+class LoginHistoryData(BaseModel):
+    total_results: int = Field(..., title="Total results count")
+    login_data: list[LoginHistoryRow] = Field(..., title="Login history data")
 
 
 class LoginUserRequest(BaseModel):
