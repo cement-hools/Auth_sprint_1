@@ -13,7 +13,7 @@ class ChangePasswordUserRequest(BaseModel):
 
 
 class LoginHistoryData(BaseModel):
-    ip: Union[IPv4Address, IPv6Address] = Field(..., title="Ip")
+    ip: str = Field(..., title="Ip")
     user_agent: Optional[Any] = Field(None, title="user_agent")
     datetime: datetime_type = Field(..., title="Datetime")
 
