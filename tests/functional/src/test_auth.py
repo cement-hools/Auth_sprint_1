@@ -1,3 +1,4 @@
+import asyncio
 from http import HTTPStatus
 
 import pytest
@@ -7,8 +8,10 @@ from tests.functional.fixtures.async_http import HTTPResponse
 from tests.functional.settings import test_settings
 
 
-@pytest.fixture(scope="session", autouse=True)
-def db_delete_everything(request):
+USER = {"login": "admin", "password": "admin23432", "email": "upc@example.com"}
+
+@pytest.fixture(scope="function", autouse=True)
+def db_delete_everything():
     def _delete(engine):
         # define the tables to delete
         table_names = [
@@ -33,17 +36,33 @@ def db_delete_everything(request):
 
 
 @pytest.fixture
-def register_user(aiohttp_post):
-    async def inner(login, email, password):
+def register_user(http_post):
+    def inner(login, email, password):
         endpoint = "registration"
         payload = {"login": login, "email": email, "password": password}
-        response = await aiohttp_post(endpoint, payload)
+        response = http_post(endpoint, payload)
         return response
 
     return inner
 
 
-@pytest.mark.asyncio_cooperative
+@pytest.fixture
+def user(register_user):
+    response = register_user(**USER)
+    return response
+
+
+@pytest.fixture
+def login_user(http_post):
+    def inner(login, password):
+        endpoint = "login"
+        payload = {"login": login, "password": password}
+        response = http_post(endpoint, payload)
+        return response
+
+    return inner
+
+
 @pytest.mark.parametrize(
     "login, email, password, response_status, success",
     [
@@ -78,9 +97,47 @@ def register_user(aiohttp_post):
         ("validlogin", "valid@ema.il", "valid password", HTTPStatus.OK, True),
     ],
 )
-async def test_registration(
+def test_registration(
     login, email, password, response_status, success, register_user
 ) -> None:
-    response = await register_user(login, email, password)
+    response = register_user(login, email, password)
+    assert response.status == response_status
+    assert response.body.get("success") == success
+
+
+@pytest.mark.parametrize(
+    "login, password, response_status, success",
+    [
+        (
+            "bad login #1",
+            "qwe",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
+        ),
+        (
+            "validlogin",
+            "qwe",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
+        ),
+        (
+            "validlogin",
+            "",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
+        ),
+        (
+            "validlogin",
+            "short",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
+        ),
+        ("validlogin", "valid password", HTTPStatus.UNAUTHORIZED, False),
+        (USER["login"], USER["password"], HTTPStatus.OK, True),
+    ],
+)
+def test_login(
+    login, password, response_status, success, login_user, user) -> None:
+    response = login_user(login, password)
     assert response.status == response_status
     assert response.body.get("success") == success

@@ -87,7 +87,7 @@ def login():
         return (
             BaseResponse(
                 success=False, error="Wrong username or password"
-            ).json(),
+            ).dict(),
             HTTPStatus.UNAUTHORIZED,
         )
 
@@ -102,7 +102,7 @@ def login():
     db.session.commit()
     jwt_tokens = create_access_and_refresh_jwt(user)
     return (
-        BaseResponse(data=jwt_tokens).json(),
+        BaseResponse(data=jwt_tokens).dict(),
         HTTPStatus.OK,
     )
 
