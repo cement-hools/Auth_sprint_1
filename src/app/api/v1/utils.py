@@ -19,17 +19,20 @@ def get_body(request_model: Type[BaseModel]):
 
 
 def before_request_log():
-    logger.info(f"{request.method}: {request.path}")
-    logger.debug(f"{request.args}")
+    logger.info("{}: {}", request.method, request.path)
+    logger.debug("{}", request.args)
     if (
         request.content_type == "application/json"
         and int(request.headers.get("Content-Length")) > 0
     ):
-        logger.debug(f"{request.get_json()}")
+        logger.debug("{}", request.get_json())
 
 
 def after_request_log(response):
     logger.debug(
-        f"Response for {request.method} {request.path}: {response.get_json()}"
+        "Response for {} {}: {}",
+        request.method,
+        request.path,
+        response.get_json(),
     )
     return response
