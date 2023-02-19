@@ -200,4 +200,4 @@ def user_roles_list():
     for role in current_user.roles:
         data.append(RoleData(id=role.id, name=role.name))
 
-    return BaseResponse(data=data).json(), HTTPStatus.OK
+    return BaseResponse(data=data).dict(), HTTPStatus.OK

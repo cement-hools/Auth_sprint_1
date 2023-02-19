@@ -27,13 +27,15 @@ def http_get(client_session):
     def inner(
         endpoint: str,
         query: dict = None,
+        token: str = None,
     ):
         url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
-        with client_session.get(url, params=query) as response:
+        headers = {"Authorization": f"Bearer {token}"}
+        with client_session.get(url, params=query, headers=headers) as response:
             body = response.json()
             headers = response.headers
             status = response.status_code
-        return HTTPResponse(status=status, headers=headers, body=body.dict())
+        return HTTPResponse(status=status, headers=headers, body=body)
 
     return inner
 

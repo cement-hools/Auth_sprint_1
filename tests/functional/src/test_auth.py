@@ -1,8 +1,10 @@
 import asyncio
+import uuid
 from http import HTTPStatus
 
 import pytest
-from sqlalchemy import MetaData, create_engine, text
+from sqlalchemy import MetaData, create_engine, text, select
+from sqlalchemy.dialects.postgresql import insert
 
 from tests.functional.fixtures.async_http import HTTPResponse
 from tests.functional.settings import test_settings
@@ -10,7 +12,8 @@ from tests.functional.settings import test_settings
 USER = {"login": "admin", "password": "admin23432", "email": "upc@example.com"}
 USER2 = {"login": "test_user", "password": "user23432",
          "email": "upc2@example.com"}
-
+ROLE_ADMIN = {"name": "admin", "description": "admin role"}
+ROLE_USER = {"name": "user", "description": "user role"}
 
 @pytest.fixture(scope="function", autouse=True)
 def db_delete_everything():
@@ -38,6 +41,42 @@ def db_delete_everything():
 
 
 @pytest.fixture
+def roles_admin():
+    engine = create_engine(test_settings.postgres_dsn)
+
+    with engine.begin() as conn:
+        uid = uuid.uuid4()
+        name = ROLE_ADMIN["name"]
+        description = ROLE_ADMIN["description"]
+        query = text(
+            "insert into roles (id, name, description) "
+            f"values ('{uid}', '{name}', '{description}');"
+        )
+        conn.execute(query)
+
+        return uid
+
+@pytest.fixture
+def roles_user():
+    engine = create_engine(test_settings.postgres_dsn)
+
+    with engine.begin() as conn:
+        uid = uuid.uuid4()
+        name = ROLE_USER["name"]
+        description = ROLE_USER["description"]
+        query = text(
+            "insert into roles (id, name, description) "
+            f"values ('{uid}', '{name}', '{description}');"
+        )
+        conn.execute(query)
+        return uid
+
+
+@pytest.fixture
+def roles(roles_admin, roles_user):
+    return roles_admin, roles_user
+
+@pytest.fixture
 def register_user(http_post):
     def inner(login, email, password):
         endpoint = "registration"
@@ -63,6 +102,23 @@ def user2(register_user):
 def user_logined(user, login_user):
     response = login_user(USER["login"], USER["password"])
     return response
+
+@pytest.fixture
+def user_logined_admin_user_role(user_logined, roles):
+    engine = create_engine(test_settings.postgres_dsn)
+    admin_role_id = roles[0]
+
+    with engine.begin() as conn:
+        user_query = text("select id from users where login = 'admin';")
+        user = conn.execute(user_query).fetchone()
+        user_id = user[0]
+        uid = uuid.uuid4()
+        query = text(
+            "insert into user_role (id, user_id, role_id) "
+            f"values ('{uid}', '{user_id}', '{admin_role_id}');"
+        )
+        res = conn.execute(query)
+    return user_logined, admin_role_id
 
 @pytest.fixture
 def user_three_history(user, login_user):
@@ -104,7 +160,7 @@ def logout_user(http_post):
 
 @pytest.fixture
 def password_change(http_post):
-    def inner(old_password, new_password):
+    def inner(old_password, new_password, token):
         endpoint = "password_change"
         payload = {
             "old_password": USER["password"],
@@ -258,8 +314,7 @@ def test_logout_all(
     }
     response = http_post(endpoint, payload, token)
     assert response.status == response_status
-    # response2 = http_post("logout", payload, token)
-    # assert response2.status == "response_status"
+
 
 
 @pytest.mark.parametrize(
@@ -302,3 +357,27 @@ def test_login_history(
     assert response.status == response_status
     if data := response.body.get("data"):
         assert len(data) == 3
+
+
+@pytest.mark.parametrize(
+    "token, response_status, success",
+    [
+        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("valid", HTTPStatus.OK, True),
+    ],
+)
+def test_user_roles_list(
+        token, response_status, success, user_logined_admin_user_role,
+        http_get
+) -> None:
+    endpoint = "user/roles"
+    user, role_id = user_logined_admin_user_role
+    if success:
+        token = user.body["data"].get("access_token")
+
+    response = http_get(endpoint, token=token)
+    assert response.status == response_status
+    if success:
+        data = response.body["data"]
+        assert len(data) == 1
+        assert data[0]["id"] == str(role_id)
