@@ -12,7 +12,7 @@ logger.remove()
 def obfuscate_message(message: str):
     """Obfuscate sensitive information."""
     result = re.sub(r"password': '.*?'", "password': [obfuscated]", message)
-    result = re.sub(r'token": ".*?"', 'token": [obfuscated]', message)
+    result = re.sub(r'token": ".*?"', 'token": [obfuscated]', result)
     return result
 
 
@@ -20,7 +20,7 @@ def formatter(record):
     record["extra"]["obfuscated_message"] = obfuscate_message(
         record["message"]
     )
-    return "[{level}] {extra[obfuscated_message]}\n{exception}"
+    return "[{level}] {time} | {extra[obfuscated_message]}\n{exception}"
 
 
 logger.add(sys.stderr, format=formatter)
