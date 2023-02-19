@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 from flask import Blueprint, request
 from flask_jwt_extended import current_user, get_jti, get_jwt, jwt_required
+from pydantic import IPvAnyNetwork
 
 from app.api.v1.auth.schemas import (
     ChangePasswordUserRequest,
@@ -11,7 +12,7 @@ from app.api.v1.auth.schemas import (
     LoginUserResData,
     LogoutUser,
     RegUserRequest,
-    RoleData,
+    RoleData, UserData,
 )
 from app.db import db, models
 from settings import logger
@@ -40,8 +41,9 @@ def registration():
     user = models.User(**body.dict())
     db.session.add(user)
     db.session.commit()
+    data = UserData(id=user.id, login=user.login, email=user.email)
 
-    return BaseResponse(success=True, error="").dict(), HTTPStatus.OK
+    return BaseResponse(success=True, data=data).dict(), HTTPStatus.OK
 
 
 @router.route("/password_change", methods=["POST"])
@@ -70,7 +72,7 @@ def password_change():
 
     jwt_tokens = create_access_and_refresh_jwt(current_user)
     return (
-        BaseResponse(data=jwt_tokens).json(),
+        BaseResponse(data=jwt_tokens).dict(),
         HTTPStatus.OK,
     )
 
@@ -87,7 +89,7 @@ def login():
         return (
             BaseResponse(
                 success=False, error="Wrong username or password"
-            ).json(),
+            ).dict(),
             HTTPStatus.UNAUTHORIZED,
         )
 
@@ -102,12 +104,12 @@ def login():
     db.session.commit()
     jwt_tokens = create_access_and_refresh_jwt(user)
     return (
-        BaseResponse(data=jwt_tokens).json(),
+        BaseResponse(data=jwt_tokens).dict(),
         HTTPStatus.OK,
     )
 
 
-@router.route("/logout", methods=["DELETE"])
+@router.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
     """
@@ -126,7 +128,7 @@ def logout():
             db.session.delete(token)
     db.session.commit()
 
-    return BaseResponse(success=True, error="").json(), HTTPStatus.OK
+    return BaseResponse(success=True, error="").dict(), HTTPStatus.OK
 
 
 @router.route("/logout_all", methods=["POST"])
@@ -145,7 +147,7 @@ def logout_all():
             invalidate_jwt(token.jwt_id, token.type)
             db.session.delete(token)
     db.session.commit()
-    return BaseResponse(success=True, error="").json(), HTTPStatus.OK
+    return BaseResponse(success=True, error="").dict(), HTTPStatus.OK
 
 
 @router.route("/refresh", methods=["POST"])
@@ -166,7 +168,7 @@ def refresh():
     jwt_tokens = create_access_and_refresh_jwt(current_user)
 
     return (
-        BaseResponse(data=jwt_tokens).json(),
+        BaseResponse(data=jwt_tokens).dict(),
         HTTPStatus.OK,
     )
 
@@ -186,7 +188,7 @@ def user_login_history():
                 ip=row.ip, user_agent=row.user_agent, datetime=row.datetime
             )
         )
-    return BaseResponse(data=data).json(), HTTPStatus.OK
+    return BaseResponse(data=data).dict(), HTTPStatus.OK
 
 
 @router.route("/user/roles", methods=["GET"])
@@ -199,4 +201,4 @@ def user_roles_list():
     for role in current_user.roles:
         data.append(RoleData(id=role.id, name=role.name))
 
-    return BaseResponse(data=data).json(), HTTPStatus.OK
+    return BaseResponse(data=data).dict(), HTTPStatus.OK
