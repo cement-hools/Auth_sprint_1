@@ -22,13 +22,15 @@ class User(db.Model):
         comment="id Пользователя",
     )
     login = db.Column(
-        db.String,
+        db.String(72),
         unique=True,
         nullable=False,
         index=True,
         comment="Логин пользователя",
     )
-    email = db.Column(db.String, nullable=False, comment="Email пользователя")
+    email = db.Column(
+        db.String(320), nullable=False, comment="Email пользователя"
+    )
     password_hash = db.Column(
         db.String(128), nullable=False, comment="Хэш пароля пользователя"
     )
@@ -67,9 +69,9 @@ class LoginHistory(db.Model):
         comment="id Записи",
     )
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey(User.id))
-    ip = db.Column(db.String, nullable=False, comment="IP пользователя")
+    ip = db.Column(db.String(45), nullable=False, comment="IP пользователя")
     user_agent = db.Column(
-        db.String, nullable=False, comment="User-Agent пользователя"
+        db.Text, nullable=False, comment="User-Agent пользователя"
     )
     datetime = db.Column(
         db.DateTime, nullable=False, comment="Дата и время входа"
