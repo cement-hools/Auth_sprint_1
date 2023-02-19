@@ -28,7 +28,7 @@ router.before_request(requires_admin)
 @router.route("/roles", methods=["GET"])
 def all_roles():
     """Список всех ролей."""
-    roles = roles_service.roles_list()
+    roles = roles_service.roles_list().data
     logger.debug("roles from DB: {}", roles)
     roles = serialize(roles, RoleItem, many=True, json_dump=False)
     logger.debug("serialized roles: {}", roles[:2])
