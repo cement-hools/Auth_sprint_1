@@ -1,6 +1,5 @@
 from datetime import datetime as datetime_type
-from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from pydantic import UUID4, BaseModel, EmailStr, Field, validator
 
@@ -12,10 +11,15 @@ class ChangePasswordUserRequest(BaseModel):
     )
 
 
-class LoginHistoryData(BaseModel):
+class LoginHistoryRow(BaseModel):
     ip: str = Field(..., title="Ip")
     user_agent: Optional[Any] = Field(None, title="user_agent")
     datetime: datetime_type = Field(..., title="Datetime")
+
+
+class LoginHistoryData(BaseModel):
+    total_results: int = Field(..., title="Total results count")
+    login_data: list[LoginHistoryRow] = Field(..., title="Login history data")
 
 
 class LoginUserRequest(BaseModel):

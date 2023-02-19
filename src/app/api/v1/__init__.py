@@ -57,3 +57,11 @@ def expired_token_callback(jwt_header, jwt_payload):
         BaseResponse(success=False, error="Expired token").dict(),
         HTTPStatus.UNAUTHORIZED,
     )
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return (
+        BaseResponse(success=False, error=error).dict(),
+        HTTPStatus.UNAUTHORIZED,
+    )
