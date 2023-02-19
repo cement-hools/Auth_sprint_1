@@ -93,13 +93,28 @@ def register_user(http_post):
 @pytest.fixture
 def user(register_user):
     response = register_user(**USER)
-    return response
+    return response.body
 
 
 @pytest.fixture
 def user2(register_user):
     response = register_user(**USER2)
     return response.body["data"]
+
+
+@pytest.fixture
+def user2_with_role(user2, roles):
+    engine = create_engine(test_settings.postgres_dsn)
+    admin_role_id, user_role_id = roles
+    user_id = user2["id"]
+    with engine.begin() as conn:
+        uid = uuid.uuid4()
+        query = text(
+            "insert into user_role (id, user_id, role_id) "
+            f"values ('{uid}', '{user_id}', '{admin_role_id}');"
+        )
+        res = conn.execute(query)
+    return user_id, admin_role_id
 
 
 @pytest.fixture
@@ -509,7 +524,6 @@ def test_delete_role(
     assert response.status == response_status
 
 
-
 @pytest.mark.parametrize(
     "token, role_id, response_status, success",
     [
@@ -518,37 +532,38 @@ def test_delete_role(
         ("valid", "", HTTPStatus.OK, True),
     ],
 )
-def test_delete_role(
+def test_delete_role_from_user(
         token, role_id, response_status, success, user_logined_admin_user_role,
-        http_delete
-) -> None:
-    user, role_id_exist = user_logined_admin_user_role
-    endpoint = f"roles/{role_id}"
-    if success:
-        token = user.body["data"].get("access_token")
-        endpoint = f"roles/{role_id_exist}"
-
-    response = http_delete(endpoint, token=token)
-    assert response.status == response_status
-
-
-@pytest.mark.parametrize(
-    "token, role_id, response_status, success",
-    [
-        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
-        ("", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
-        ("valid", "", HTTPStatus.OK, True),
-    ],
-)
-def test_add_role_to_user(
-        token, role_id, response_status, success, user_logined_admin_user_role,
-        http_post, user2
+        http_post, user2_with_role
 ) -> None:
     user, admin_role_id = user_logined_admin_user_role
-    endpoint = f"roles/{admin_role_id}/add_user"
+    user_to_delete, role_id = user2_with_role
+    endpoint = f"roles/{role_id}/del_user"
     if success:
         token = user.body["data"].get("access_token")
-    payload = {"user_id": user2['id']}
+    payload = {"user_id": user_to_delete}
     response = http_post(endpoint, payload, token)
+    assert response.status == response_status
+    assert response.body.get("success", False) == success
+
+
+@pytest.mark.parametrize(
+    "token, role_id, response_status, success",
+    [
+        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("valid", "", HTTPStatus.OK, True),
+    ],
+)
+def test_check_user_role(
+        token, role_id, response_status, success, user_logined_admin_user_role,
+        http_get, user2_with_role
+) -> None:
+    user, admin_role_id = user_logined_admin_user_role
+    user_check, role_id = user2_with_role
+    endpoint = f"roles/{role_id}/{user_check}/check"
+    if success:
+        token = user.body["data"].get("access_token")
+    response = http_get(endpoint, token=token)
     assert response.status == response_status
     assert response.body.get("success", False) == success
