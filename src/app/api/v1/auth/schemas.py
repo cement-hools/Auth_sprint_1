@@ -49,6 +49,12 @@ class RegUserRequest(BaseModel):
         return v
 
 
+class UserData(BaseModel):
+    id: UUID4 = Field(..., title="Id")
+    login: str = Field(..., title="Login")
+    email: EmailStr = Field(..., title="Email")
+
+
 class RoleData(BaseModel):
     id: UUID4 = Field(..., title="Id")
     name: str = Field(..., title="Name")

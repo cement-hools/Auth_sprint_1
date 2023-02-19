@@ -12,7 +12,7 @@ from app.api.v1.auth.schemas import (
     LoginUserResData,
     LogoutUser,
     RegUserRequest,
-    RoleData,
+    RoleData, UserData,
 )
 from app.db import db, models
 from settings import logger
@@ -41,8 +41,9 @@ def registration():
     user = models.User(**body.dict())
     db.session.add(user)
     db.session.commit()
+    data = UserData(id=user.id, login=user.login, email=user.email)
 
-    return BaseResponse(success=True, error="").dict(), HTTPStatus.OK
+    return BaseResponse(success=True, data=data).dict(), HTTPStatus.OK
 
 
 @router.route("/password_change", methods=["POST"])

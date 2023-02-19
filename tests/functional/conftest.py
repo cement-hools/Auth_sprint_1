@@ -11,6 +11,8 @@ from tests.functional.fixtures.http import (
     client_session,
     http_get,
     http_post,
+    http_put,
+    http_delete
 )
 
 def pytest_configure():

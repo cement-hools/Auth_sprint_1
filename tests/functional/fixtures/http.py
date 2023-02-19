@@ -58,3 +58,43 @@ def http_post(client_session):
         return HTTPResponse(status=status, headers=headers, body=body)
 
     return inner
+
+
+@pytest.fixture
+def http_put(client_session):
+    def inner(
+        endpoint: str,
+        json: str = None,
+        token: str = None,
+    ):
+        url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
+        headers = {"Authorization": f"Bearer {token}"}
+        with client_session.put(
+            url, json=json, headers=headers
+        ) as response:
+            body = response.json()
+            headers = response.headers
+            status = response.status_code
+        return HTTPResponse(status=status, headers=headers, body=body)
+
+    return inner
+
+
+@pytest.fixture
+def http_delete(client_session):
+    def inner(
+        endpoint: str,
+        json: str = None,
+        token: str = None,
+    ):
+        url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
+        headers = {"Authorization": f"Bearer {token}"}
+        with client_session.delete(
+            url, json=json, headers=headers
+        ) as response:
+            body = response.json()
+            headers = response.headers
+            status = response.status_code
+        return HTTPResponse(status=status, headers=headers, body=body)
+
+    return inner
