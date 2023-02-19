@@ -2,8 +2,8 @@ from datetime import timedelta
 
 from flask import Flask
 
-from app.api.v1.utils import after_request_log, before_request_log
 from app.jwt_app import jwt, jwt_redis_blocklist
+from app.utils import after_request_log, before_request_log
 from cli_commands import create_user
 from settings import flask_settings, jwt_settings, redis_settings
 
