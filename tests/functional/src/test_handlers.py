@@ -143,8 +143,8 @@ def user_logined_admin_user_role(user_logined, roles):
 
 @pytest.fixture
 def user_three_history(user, login_user):
-    response = login_user(USER["login"], USER["password"])
-    response = login_user(USER["login"], USER["password"])
+    login_user(USER["login"], USER["password"])
+    login_user(USER["login"], USER["password"])
     response = login_user(USER["login"], USER["password"])
     return response
 
@@ -279,7 +279,7 @@ def test_login(
 @pytest.mark.parametrize(
     "refresh_token, token, response_status, success",
     [
-        ("validlogin", "valid password", HTTPStatus.UNPROCESSABLE_ENTITY,
+        ("validlogin", "valid password", HTTPStatus.UNAUTHORIZED,
          False),
         (USER["login"], USER["password"], HTTPStatus.OK, True),
     ],
@@ -319,7 +319,7 @@ def test_password_change(
 @pytest.mark.parametrize(
     "refresh_token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -343,7 +343,7 @@ def test_logout_all(
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -363,7 +363,7 @@ def test_refresh(
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -379,13 +379,13 @@ def test_login_history(
     response = http_get(endpoint, token=token)
     assert response.status == response_status
     if data := response.body.get("data"):
-        assert len(data) == 3
+        assert data.get("total_results", 0) == 3
 
 
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -409,7 +409,7 @@ def test_user_roles_list(
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -432,7 +432,7 @@ def test_all_roles(
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -457,7 +457,7 @@ def test_create_role(
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -480,7 +480,7 @@ def test_detail_role(
 @pytest.mark.parametrize(
     "token, response_status, success",
     [
-        ("sdzffdh", HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", HTTPStatus.UNAUTHORIZED, False),
         ("valid", HTTPStatus.OK, True),
     ],
 )
@@ -505,8 +505,8 @@ def test_edit_role(
 @pytest.mark.parametrize(
     "token, role_id, response_status, success",
     [
-        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
-        ("", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNAUTHORIZED, False),
+        ("", uuid.uuid4(), HTTPStatus.UNAUTHORIZED, False),
         ("valid", "", HTTPStatus.OK, True),
     ],
 )
@@ -527,8 +527,8 @@ def test_delete_role(
 @pytest.mark.parametrize(
     "token, role_id, response_status, success",
     [
-        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
-        ("", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNAUTHORIZED, False),
+        ("", uuid.uuid4(), HTTPStatus.UNAUTHORIZED, False),
         ("valid", "", HTTPStatus.OK, True),
     ],
 )
@@ -550,8 +550,8 @@ def test_delete_role_from_user(
 @pytest.mark.parametrize(
     "token, role_id, response_status, success",
     [
-        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
-        ("", uuid.uuid4(), HTTPStatus.UNPROCESSABLE_ENTITY, False),
+        ("sdzffdh", uuid.uuid4(), HTTPStatus.UNAUTHORIZED, False),
+        ("", uuid.uuid4(), HTTPStatus.UNAUTHORIZED, False),
         ("valid", "", HTTPStatus.OK, True),
     ],
 )
