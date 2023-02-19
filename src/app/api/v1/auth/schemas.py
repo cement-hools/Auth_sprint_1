@@ -13,7 +13,7 @@ class ChangePasswordUserRequest(BaseModel):
 
 
 class LoginHistoryData(BaseModel):
-    ip: Union[IPv4Address, IPv6Address] = Field(..., title="Ip")
+    ip: str = Field(..., title="Ip")
     user_agent: Optional[Any] = Field(None, title="user_agent")
     datetime: datetime_type = Field(..., title="Datetime")
 
@@ -47,6 +47,12 @@ class RegUserRequest(BaseModel):
     def login_alphanumeric(cls, v):
         assert v.isalnum(), "must be alphanumeric"
         return v
+
+
+class UserData(BaseModel):
+    id: UUID4 = Field(..., title="Id")
+    login: str = Field(..., title="Login")
+    email: EmailStr = Field(..., title="Email")
 
 
 class RoleData(BaseModel):

@@ -23,9 +23,9 @@ router = Blueprint("role", __name__)
 
 ROLE_404_MESSAGE = "Role not found"
 
-router.before_request(
-    requires_admin
-)  # Admin role required for all routes in this blueprint
+
+# Admin role required for all routes in this blueprint
+router.before_request(requires_admin)
 
 
 @router.route("/roles", methods=["GET"])

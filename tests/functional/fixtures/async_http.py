@@ -45,7 +45,7 @@ def aiohttp_post(aiohttp_client_session):
         token: str = None,
     ):
         url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
-        headers = {"Authorization": f"bearer {token}"}
+        headers = {"Authorization": f"Bearer {token}"}
         async with aiohttp_client_session.post(
             url, json=json, headers=headers
         ) as response:
