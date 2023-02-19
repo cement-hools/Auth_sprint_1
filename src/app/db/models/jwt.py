@@ -22,4 +22,4 @@ class JWTStore(db.Model):
     jwt_id = db.Column(db.String(36), nullable=False, index=True)
     expiration_date = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(UUID, ForeignKey(User.id))
-    type = db.Column(db.String, nullable=False)
+    type = db.Column(db.String(32), nullable=False)
