@@ -35,7 +35,7 @@ def registration(
     db.session.add(user)
     db.session.commit()
 
-    return ServiceResult(success=True)
+    return ServiceResult(success=True, data=user)
 
 
 def login(

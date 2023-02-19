@@ -37,7 +37,10 @@ def registration():
             BaseResponse(success=False, error=result.error_message).dict()
         ), HTTPStatus.BAD_REQUEST
     else:
-        return BaseResponse(success=True, error="").dict(), HTTPStatus.OK
+        data = UserData(
+            id=result.data.id, login=result.data.login, email=result.data.email
+        )
+        return BaseResponse(success=True, data=data).dict(), HTTPStatus.OK
 
 
 @router.route("/login", methods=["POST"])
