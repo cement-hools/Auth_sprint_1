@@ -1,5 +1,6 @@
 import re
 import sys
+from pathlib import Path
 
 from dotenv import find_dotenv
 from loguru import logger as loguru_logger
@@ -7,6 +8,10 @@ from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn
 
 logger = loguru_logger
 logger.remove()
+
+BASE_DIR = Path(__file__).resolve().parent
+
+MIGRATION_DIR = BASE_DIR / "app" / "db" / "migrations"
 
 
 def obfuscate_message(message: str):

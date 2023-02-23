@@ -94,5 +94,9 @@ class UserRole(db.Model):
         unique=True,
         nullable=False,
     )
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey(User.id))
-    role_id = db.Column(UUID(as_uuid=True), db.ForeignKey(Role.id))
+    user_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey(User.id, ondelete="CASCADE")
+    )
+    role_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey(Role.id, ondelete="CASCADE")
+    )

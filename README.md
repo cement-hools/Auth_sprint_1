@@ -18,6 +18,26 @@ curl  -H "Content-Type: application/json" -d "{\"login\": \"testuser\", \"email\
 make stop
 ```
 
+### Migrations
+* apply migrations
+```
+ flask db upgrade
+```
+* auto generate migration
+```
+ flask db migrate -m "message"
+```
+* roll back migration
+```
+ flask db downgrade
+```
+* create empty migration
+```
+ flask db revision -m "message"
+```
+
+
+
 ### Create users
 While app is running you can create users like so:
 ```
