@@ -17,13 +17,13 @@ class SinglePersonAPIResponse(BaseModel):
     full_name: str | None = None
 
 
-@router.get("", response_model=list[Person] | None)
-@router.get("/search", response_model=list[Person] | None)
+@router.get('', response_model=list[Person] | None)
+@router.get('/search', response_model=list[Person] | None)
 @cache(expire=settings.cache_expiration_in_seconds)
 async def person_list(
-    query_filter: QueryFilter = Depends(),
-    pagination_filter: PaginationFilter = Depends(),
-    person_service: PersonService = Depends(get_person_service),
+        query_filter: QueryFilter = Depends(),
+        pagination_filter: PaginationFilter = Depends(),
+        person_service: PersonService = Depends(get_person_service),
 ) -> list[Person] | None:
     """
     Gets a list of persons.
@@ -40,11 +40,11 @@ async def person_list(
     return items
 
 
-@router.get("/{person_id}", response_model=SinglePersonAPIResponse)
+@router.get('/{person_id}', response_model=SinglePersonAPIResponse)
 @cache(expire=settings.cache_expiration_in_seconds)
 async def person_details(
-    person_id: str,
-    person_service: PersonService = Depends(get_person_service),
+        person_id: str,
+        person_service: PersonService = Depends(get_person_service),
 ) -> SinglePersonAPIResponse:
     """
     Gets a single person by its ID.
@@ -55,7 +55,6 @@ async def person_details(
     person = await person_service.get_by_id(person_id)
     if not person:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail=f"id: '{person_id}' is not found",
+            status_code=HTTPStatus.NOT_FOUND, detail=f"id: '{person_id}' is not found"
         )
     return SinglePersonAPIResponse(**person.dict())

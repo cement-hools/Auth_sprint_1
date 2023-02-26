@@ -8,7 +8,7 @@ def orjson_dumps(v, *, default):
 
 
 class UUIDMixin(BaseModel):
-    uuid: str = Field(alias="id")
+    uuid: str = Field(alias='id')
 
 
 class BaseModelMixin(BaseModel):

@@ -12,7 +12,6 @@ class Genre(BaseModelMixin):
 
 
 class GenreSortFilter(BaseSortFilter):
+
     class Config:
-        allowed_filter_field_names = [
-            "name",
-        ]
+        allowed_filter_field_names = ['name', ]

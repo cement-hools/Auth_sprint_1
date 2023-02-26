@@ -10,7 +10,10 @@ loggerb = logging.getLogger(__name__)
 
 
 def my_backoff(
-    start_sleep_time=0.1, factor=2, border_sleep_time=10, logger=loggerb
+        start_sleep_time=0.1,
+        factor=2,
+        border_sleep_time=10,
+        logger=loggerb
 ) -> Any:
     """Функция для повторного выполнения функции через некоторое время, если
     возникла ошибка.
@@ -20,7 +23,6 @@ def my_backoff(
         border_sleep_time (int, optional): граничное время ожидания.
         logger (logging): информатор
     """
-
     def func_wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
@@ -33,13 +35,9 @@ def my_backoff(
                     if sleep_time >= border_sleep_time:
                         sleep_time = border_sleep_time
                     else:
-                        sleep_time = min(
-                            sleep_time * factor, border_sleep_time
-                        )
+                        sleep_time = min(sleep_time * factor, border_sleep_time)
                     sleep(sleep_time)
-
         return inner
-
     return func_wrapper
 
 
@@ -51,7 +49,7 @@ def db_error_handler(func):
         except sqlite3.Error as err:
             loggerb.error(f'Ошибка SQLite: {" ".join(err.args)}')
         except psycopg2.Error as err:
-            loggerb.error(f"Postgres error: {err.pgcode}")
+            loggerb.error(f'Postgres error: {err.pgcode}')
             loggerb.error(err)
         return result
 
