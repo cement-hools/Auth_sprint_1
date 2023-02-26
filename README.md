@@ -48,7 +48,7 @@ make user args="superman super@example.com p@ssword --admin"
 
 ## Development
 ### Pre-commit hooks
-* pip install pre-commit from requirements.txt
+* `pip install pre-commit`
 * `pre-commit install`
 * Done!
 

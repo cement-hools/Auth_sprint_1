@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from elasticsearch import NotFoundError, AsyncElasticsearch
 
 from core.config import settings
+from db.base import AsyncFulltextSearch
 from db.elastic import AsyncESearch
+from elasticsearch import AsyncElasticsearch, NotFoundError
 from models.genre import Genre
 from models.person import Person
 from models.show import Show
-from db.base import AsyncFulltextSearch
 
 
 class BaseService(ABC):
@@ -17,17 +17,14 @@ class BaseService(ABC):
 
     @abstractmethod
     async def get_many_with_query_filter_sort_pagination(
-            self, query, index_filter, sort, pagination
+        self, query, index_filter, sort, pagination
     ):
         pass
 
     @abstractmethod
-    async def get_by_id(
-            self, id: str
-    ):
+    async def get_by_id(self, id: str):
         """
         Get a single self.single_item_model type item by its id from self.index_name index in Elastic.
         :param id:
         :return:
         """
-        pass

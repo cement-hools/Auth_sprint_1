@@ -1,17 +1,19 @@
-import asyncio
 import uuid
 from http import HTTPStatus
 
 import pytest
-from sqlalchemy import MetaData, create_engine, text, select
+from sqlalchemy import MetaData, create_engine, select, text
 from sqlalchemy.dialects.postgresql import insert
 
 from tests.functional.fixtures.async_http import HTTPResponse
 from tests.functional.settings import test_settings
 
 USER = {"login": "admin", "password": "admin23432", "email": "upc@example.com"}
-USER2 = {"login": "testuser", "password": "user23432",
-         "email": "upc2@example.com"}
+USER2 = {
+    "login": "testuser",
+    "password": "user23432",
+    "email": "upc2@example.com",
+}
 ROLE_ADMIN = {"name": "admin", "description": "admin role"}
 ROLE_USER = {"name": "user", "description": "user role"}
 
@@ -113,7 +115,7 @@ def user2_with_role(user2, roles):
             "insert into user_role (id, user_id, role_id) "
             f"values ('{uid}', '{user_id}', '{admin_role_id}');"
         )
-        res = conn.execute(query)
+        conn.execute(query)
     return user_id, admin_role_id
 
 
@@ -137,7 +139,7 @@ def user_logined_admin_user_role(user_logined, roles):
             "insert into user_role (id, user_id, role_id) "
             f"values ('{uid}', '{user_id}', '{admin_role_id}');"
         )
-        res = conn.execute(query)
+        conn.execute(query)
     return user_logined, admin_role_id
 
 
@@ -188,7 +190,7 @@ def password_change(http_post):
         endpoint = "password_change"
         payload = {
             "old_password": USER["password"],
-            "new_password": "new_valid_password"
+            "new_password": "new_valid_password",
         }
         response = http_post(endpoint, payload, token)
         return response
@@ -200,38 +202,38 @@ def password_change(http_post):
     "login, email, password, response_status, success",
     [
         (
-                "bad login #1",
-                "valid@ema.il",
-                "qwe",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "bad login #1",
+            "valid@ema.il",
+            "qwe",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         (
-                "validlogin",
-                "not email",
-                "qwe",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "validlogin",
+            "not email",
+            "qwe",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         (
-                "validlogin",
-                "valid@ema.il",
-                "",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "validlogin",
+            "valid@ema.il",
+            "",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         (
-                "validlogin",
-                "valid@ema.il",
-                "short",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "validlogin",
+            "valid@ema.il",
+            "short",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         ("validlogin", "valid@ema.il", "valid password", HTTPStatus.OK, True),
     ],
 )
 def test_registration(
-        login, email, password, response_status, success, register_user
+    login, email, password, response_status, success, register_user
 ) -> None:
     response = register_user(login, email, password)
     assert response.status == response_status
@@ -242,35 +244,36 @@ def test_registration(
     "login, password, response_status, success",
     [
         (
-                "bad login #1",
-                "qwe",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "bad login #1",
+            "qwe",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         (
-                "validlogin",
-                "qwe",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "validlogin",
+            "qwe",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         (
-                "validlogin",
-                "",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "validlogin",
+            "",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         (
-                "validlogin",
-                "short",
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                False,
+            "validlogin",
+            "short",
+            HTTPStatus.UNPROCESSABLE_ENTITY,
+            False,
         ),
         ("validlogin", "valid password", HTTPStatus.UNAUTHORIZED, False),
         (USER["login"], USER["password"], HTTPStatus.OK, True),
     ],
 )
 def test_login(
-        login, password, response_status, success, login_user, user) -> None:
+    login, password, response_status, success, login_user, user
+) -> None:
     response = login_user(login, password)
     assert response.status == response_status
     assert response.body.get("success") == success
@@ -279,14 +282,12 @@ def test_login(
 @pytest.mark.parametrize(
     "refresh_token, token, response_status, success",
     [
-        ("validlogin", "valid password", HTTPStatus.UNAUTHORIZED,
-         False),
+        ("validlogin", "valid password", HTTPStatus.UNAUTHORIZED, False),
         (USER["login"], USER["password"], HTTPStatus.OK, True),
     ],
 )
 def test_logout(
-        refresh_token, token, response_status, success, user_logined,
-        logout_user
+    refresh_token, token, response_status, success, user_logined, logout_user
 ) -> None:
     if success:
         refresh_token = user_logined.body["data"].get("refresh_token")
@@ -304,14 +305,11 @@ def test_logout(
     ],
 )
 def test_password_change(
-        old, new, response_status, success, user_logined, http_post
+    old, new, response_status, success, user_logined, http_post
 ) -> None:
     token = user_logined.body["data"].get("access_token")
     endpoint = "password_change"
-    payload = {
-        "old_password": old,
-        "new_password": new
-    }
+    payload = {"old_password": old, "new_password": new}
     response = http_post(endpoint, payload, token)
     assert response.status == response_status
 
@@ -324,8 +322,7 @@ def test_password_change(
     ],
 )
 def test_logout_all(
-        refresh_token, response_status, success, user_logined,
-        http_post
+    refresh_token, response_status, success, user_logined, http_post
 ) -> None:
     endpoint = "logout_all"
     user1 = user_logined
@@ -348,8 +345,7 @@ def test_logout_all(
     ],
 )
 def test_refresh(
-        token, response_status, success, user_logined,
-        http_post
+    token, response_status, success, user_logined, http_post
 ) -> None:
     endpoint = "refresh"
     user = user_logined
@@ -368,8 +364,7 @@ def test_refresh(
     ],
 )
 def test_login_history(
-        token, response_status, success, user_three_history,
-        http_get
+    token, response_status, success, user_three_history, http_get
 ) -> None:
     endpoint = "user/login_history"
     user = user_three_history
@@ -390,8 +385,7 @@ def test_login_history(
     ],
 )
 def test_user_roles_list(
-        token, response_status, success, user_logined_admin_user_role,
-        http_get
+    token, response_status, success, user_logined_admin_user_role, http_get
 ) -> None:
     endpoint = "user/roles"
     user, role_id = user_logined_admin_user_role
@@ -414,8 +408,7 @@ def test_user_roles_list(
     ],
 )
 def test_all_roles(
-        token, response_status, success, user_logined_admin_user_role,
-        http_get
+    token, response_status, success, user_logined_admin_user_role, http_get
 ) -> None:
     endpoint = "roles"
     user, role_id = user_logined_admin_user_role
@@ -437,16 +430,13 @@ def test_all_roles(
     ],
 )
 def test_create_role(
-        token, response_status, success, user_logined_admin_user_role,
-        http_post
+    token, response_status, success, user_logined_admin_user_role, http_post
 ) -> None:
     endpoint = "roles"
     user = user_logined_admin_user_role[0]
     if success:
         token = user.body["data"].get("access_token")
-    payload = {
-        "name": "test_role", "description": "test_role_description"
-    }
+    payload = {"name": "test_role", "description": "test_role_description"}
     response = http_post(endpoint, payload, token=token)
     assert response.status == response_status
     if success:
@@ -462,8 +452,7 @@ def test_create_role(
     ],
 )
 def test_detail_role(
-        token, response_status, success, user_logined_admin_user_role,
-        http_get
+    token, response_status, success, user_logined_admin_user_role, http_get
 ) -> None:
     user, role_id = user_logined_admin_user_role
     endpoint = f"roles/{role_id}"
@@ -485,16 +474,13 @@ def test_detail_role(
     ],
 )
 def test_edit_role(
-        token, response_status, success, user_logined_admin_user_role,
-        http_put
+    token, response_status, success, user_logined_admin_user_role, http_put
 ) -> None:
     user, role_id = user_logined_admin_user_role
     endpoint = f"roles/{role_id}"
     if success:
         token = user.body["data"].get("access_token")
-    payload = {
-        "name": "test_role", "description": "test_role_description"
-    }
+    payload = {"name": "test_role", "description": "test_role_description"}
     response = http_put(endpoint, payload, token=token)
     assert response.status == response_status
     if success:
@@ -511,8 +497,12 @@ def test_edit_role(
     ],
 )
 def test_delete_role(
-        token, role_id, response_status, success, user_logined_admin_user_role,
-        http_delete
+    token,
+    role_id,
+    response_status,
+    success,
+    user_logined_admin_user_role,
+    http_delete,
 ) -> None:
     user, role_id_exist = user_logined_admin_user_role
     endpoint = f"roles/{role_id}"
@@ -533,8 +523,13 @@ def test_delete_role(
     ],
 )
 def test_delete_role_from_user(
-        token, role_id, response_status, success, user_logined_admin_user_role,
-        http_post, user2_with_role
+    token,
+    role_id,
+    response_status,
+    success,
+    user_logined_admin_user_role,
+    http_post,
+    user2_with_role,
 ) -> None:
     user, admin_role_id = user_logined_admin_user_role
     user_to_delete, role_id = user2_with_role
@@ -556,8 +551,13 @@ def test_delete_role_from_user(
     ],
 )
 def test_check_user_role(
-        token, role_id, response_status, success, user_logined_admin_user_role,
-        http_get, user2_with_role
+    token,
+    role_id,
+    response_status,
+    success,
+    user_logined_admin_user_role,
+    http_get,
+    user2_with_role,
 ) -> None:
     user, admin_role_id = user_logined_admin_user_role
     user_check, role_id = user2_with_role

@@ -11,7 +11,7 @@ class AsyncFulltextSearch(ABC):
 
     @abstractmethod
     async def get_many_with_query_filter_sort_pagination(
-            self, index, query, index_filter, sort, pagination
+        self, index, query, index_filter, sort, pagination
     ):
         pass
 

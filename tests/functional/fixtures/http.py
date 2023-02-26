@@ -31,7 +31,9 @@ def http_get(client_session):
     ):
         url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
         headers = {"Authorization": f"Bearer {token}"}
-        with client_session.get(url, params=query, headers=headers) as response:
+        with client_session.get(
+            url, params=query, headers=headers
+        ) as response:
             body = response.json()
             headers = response.headers
             status = response.status_code
@@ -49,9 +51,7 @@ def http_post(client_session):
     ):
         url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
         headers = {"Authorization": f"Bearer {token}"}
-        with client_session.post(
-            url, json=json, headers=headers
-        ) as response:
+        with client_session.post(url, json=json, headers=headers) as response:
             body = response.json()
             headers = response.headers
             status = response.status_code
@@ -69,9 +69,7 @@ def http_put(client_session):
     ):
         url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
         headers = {"Authorization": f"Bearer {token}"}
-        with client_session.put(
-            url, json=json, headers=headers
-        ) as response:
+        with client_session.put(url, json=json, headers=headers) as response:
             body = response.json()
             headers = response.headers
             status = response.status_code

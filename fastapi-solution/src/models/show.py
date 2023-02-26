@@ -22,18 +22,17 @@ class Show(BaseModelMixin):
 
 class ShowGenreFilter:
     def __init__(
-            self,
-            genre_id: str = Query(
-                None,
-                description='Genre UUID4, which is used to output '
-                            'only Shows with corresponding genres',
-                alias='filter[genre]',
-            ),
+        self,
+        genre_id: str = Query(
+            None,
+            description="Genre UUID4, which is used to output "
+            "only Shows with corresponding genres",
+            alias="filter[genre]",
+        ),
     ):
         self.genre_id = genre_id
 
 
 class ShowSortFilter(BaseSortFilter):
-
     class Config:
-        allowed_filter_field_names = ['imdb_rating']
+        allowed_filter_field_names = ["imdb_rating"]

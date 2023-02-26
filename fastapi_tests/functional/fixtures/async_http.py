@@ -2,9 +2,8 @@ from dataclasses import dataclass
 
 import aiohttp
 import pytest
-from multidict import CIMultiDictProxy
-
 from functional.settings import test_settings
+from multidict import CIMultiDictProxy
 
 
 @dataclass
@@ -14,7 +13,7 @@ class HTTPResponse:
     body: str
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 async def aiohttp_client_session():
     session = aiohttp.ClientSession()
     yield session
@@ -24,10 +23,10 @@ async def aiohttp_client_session():
 @pytest.fixture
 def aiohttp_get(aiohttp_client_session):
     async def inner(
-            endpoint: str,
-            query: dict = None,
+        endpoint: str,
+        query: dict = None,
     ):
-        url = f'{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}'
+        url = f"{test_settings.api_service_url}{test_settings.api_v1_base_path}{endpoint}"
         async with aiohttp_client_session.get(url, params=query) as response:
             body = await response.json()
             headers = response.headers

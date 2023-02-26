@@ -5,4 +5,5 @@ select = B,C,E,F,W,T4,B9
 ignore = E203, E266, E501, W503, F403, F401
 per-file-ignores =
     */__init__.py: F401
+    db_query.py: W291
 exclude = flask/app/db/migrations/versions/*

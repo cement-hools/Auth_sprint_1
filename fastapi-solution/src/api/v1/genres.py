@@ -19,13 +19,13 @@ class SingleGenreAPIResponse(BaseModel):
 
 
 # Pydantic supports the creation of generic models
-@router.get('', response_model=list[Genre] | None)
-@router.get('/search', response_model=list[Genre] | None)
+@router.get("", response_model=list[Genre] | None)
+@router.get("/search", response_model=list[Genre] | None)
 @cache(expire=settings.cache_expiration_in_seconds)
 async def genre_list(
-        query_filter: QueryFilter = Depends(),
-        pagination_filter: PaginationFilter = Depends(),
-        genre_service: GenreService = Depends(get_genre_service),
+    query_filter: QueryFilter = Depends(),
+    pagination_filter: PaginationFilter = Depends(),
+    genre_service: GenreService = Depends(get_genre_service),
 ) -> list[Genre] | None:
     """
     Gets a list of genres.
@@ -41,11 +41,11 @@ async def genre_list(
     return items
 
 
-@router.get('/{genre_id}', response_model=SingleGenreAPIResponse)
+@router.get("/{genre_id}", response_model=SingleGenreAPIResponse)
 @cache(expire=settings.cache_expiration_in_seconds)
 async def genre_details(
-        genre_id: str,
-        genre_service: GenreService = Depends(get_genre_service),
+    genre_id: str,
+    genre_service: GenreService = Depends(get_genre_service),
 ) -> SingleGenreAPIResponse:
     """
     Gets a single genre by its ID.
@@ -57,6 +57,6 @@ async def genre_details(
     if not genre:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail=f"id: '{genre_id}' is not found"
+            detail=f"id: '{genre_id}' is not found",
         )
     return SingleGenreAPIResponse(**genre.dict())

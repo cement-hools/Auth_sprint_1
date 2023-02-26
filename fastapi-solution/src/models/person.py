@@ -11,6 +11,7 @@ class Person(BaseModelMixin):
 
 
 class PersonSortFilter(BaseSortFilter):
-
     class Config:
-        allowed_filter_field_names = ['full_name', ]
+        allowed_filter_field_names = [
+            "full_name",
+        ]
