@@ -121,3 +121,5 @@ cython_debug/
 
 /.env
 /venv/
+/.fa.docker.env
+/.fa.env
