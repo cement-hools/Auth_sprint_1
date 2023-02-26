@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from app import jwt_redis_blocklist
-from app.api.v1.auth.schemas import LoginUserResData
-from app.db import db, models
+from flask import current_app
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     get_jti,
 )
 
-from flask import current_app
+from app import jwt_redis_blocklist
+from app.api.v1.auth.schemas import LoginUserResData
+from app.db import db, models
 
 
 def create_access_and_refresh_jwt(user: models.User) -> LoginUserResData:
