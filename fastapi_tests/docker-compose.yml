@@ -1,0 +1,21 @@
+
+services:
+
+  elasticsearch:
+    ports:
+      - "9200:9200"
+    environment:
+      - 'path.repo=/tmp/test_repo/'
+    volumes:
+      - ./tests/functional/testdata/test_repo:/tmp/test_repo
+
+  async_api:
+    ports:
+      - "8000:8000"
+    environment:
+      - CACHE_EXPIRATION_IN_SECONDS=1
+    entrypoint: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  redis:
+    ports:
+      - "6379:6379"

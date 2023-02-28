@@ -2,10 +2,12 @@ Repo address:
 https://github.com/cement-hools/Auth_sprint_1/
 
 # Flask-based Auth API
-Sprint 6 in Practicum middle-python course.  
+Sprint 7 in Practicum middle-python course.  
 Teamwork of
 * [Maxim Sekachev ](https://github.com/cement-hools)
 * [Andrey Lepekhin](https://github.com/andrey-lepekhin)
+
+FastAPI Shows API based on https://github.com/andrey-lepekhin/Async_API_sprint_2
 
 Architecture
 [<img src="./schemas/architecture.jpeg" alt="Image of the process architecture" width="400px"/>](./schemas/architecture.jpeg) 
