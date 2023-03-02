@@ -1,17 +1,19 @@
 from datetime import timedelta
 
+from authlib.integrations.flask_client import OAuth
 from flask import Flask
-from flask_migrate import Migrate
 
 from app.jwt_app import jwt, jwt_redis_blocklist
 from app.utils import after_request_log, before_request_log
 from cli_commands import create_user
 from settings import (
-    MIGRATION_DIR,
+    OAuthYandexSettings,
     flask_settings,
     jwt_settings,
     redis_settings,
 )
+
+oauth = OAuth()
 
 
 def create_app():
@@ -44,6 +46,10 @@ def create_app():
 
     # CLI
     app.cli.add_command(create_user)
+
+    app.config.update(OAuthYandexSettings().dict())
+    oauth.init_app(app)
+    oauth.register(name="yandex")
 
     return app
 

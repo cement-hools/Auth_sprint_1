@@ -55,6 +55,34 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+class SocialAccount(db.Model):
+    """Аккаунт в социальной сети."""
+
+    __tablename__ = "social_accounts"
+    __table_args__ = (
+        db.UniqueConstraint("social_id", "social_name", name="social_pk"),
+    )
+
+    id = db.Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    user_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey(User.id, ondelete="CASCADE"),
+        nullable=False,
+    )
+    user = db.relationship(
+        User, backref=db.backref("social_accounts", lazy=True)
+    )
+    social_id = db.Column(db.String(128), nullable=False)
+    social_name = db.Column(db.String(128), nullable=False)
+
+    def __repr__(self):
+        return f"<SocialAccount {self.social_name}:{self.user_id}>"
+
+
 class LoginHistory(db.Model):
     """История входа пользователя."""
 
@@ -68,7 +96,9 @@ class LoginHistory(db.Model):
         nullable=False,
         comment="id Записи",
     )
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey(User.id))
+    user_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey(User.id, ondelete="CASCADE")
+    )
     ip = db.Column(db.String(45), nullable=False, comment="IP пользователя")
     user_agent = db.Column(
         db.Text, nullable=False, comment="User-Agent пользователя"
