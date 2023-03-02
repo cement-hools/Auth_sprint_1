@@ -14,7 +14,7 @@ from app.services.auth_utils import create_access_and_refresh_jwt
 def login_yandex_user(account_user: yandex.User):
     """OAuth Яндекс пользователя."""
     social_account = SocialAccount.query.filter(
-        SocialAccount.social_id == account_user.client_id,
+        SocialAccount.social_id == account_user.id,
         SocialAccount.social_name == account_user.social_name,
     ).first()
     if not social_account:
@@ -28,7 +28,7 @@ def login_yandex_user(account_user: yandex.User):
         user_role = Role.query.filter(Role.name == "user").first()
         user.roles.append(user_role)
         account = SocialAccount(
-            social_id=account_user.client_id,
+            social_id=account_user.id,
             social_name=account_user.social_name,
             user_id=user.id,
         )
