@@ -86,10 +86,8 @@ class RedisSettings(BaseSettings):
 class UserRoles(BaseSettings):
     """Setting up basic app roles uuids"""
 
-    uuids = {
-        "admin": "9b751230-c16b-40af-8732-2f0c20961a04",
-        "user": "1ac6344c-bb0f-4903-9d2e-9fe182ea7132",
-    }
+    admin: str = "admin"
+    user: str = "user"
 
 
 class OAuthYandexSettings(BaseSettings):

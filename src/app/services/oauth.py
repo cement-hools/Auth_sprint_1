@@ -9,6 +9,7 @@ from app.db import db
 from app.db.models import LoginHistory, Role, SocialAccount
 from app.services.auth import login, registration
 from app.services.auth_utils import create_access_and_refresh_jwt
+from settings import user_roles_settings
 
 
 def login_yandex_user(account_user: yandex.User):
@@ -25,7 +26,8 @@ def login_yandex_user(account_user: yandex.User):
             email=account_user.email,
             password=password,
         ).data
-        user_role = Role.query.filter(Role.name == "user").first()
+        admin_role_name = user_roles_settings.admin
+        user_role = Role.query.filter(Role.name == admin_role_name).first()
         user.roles.append(user_role)
         account = SocialAccount(
             social_id=account_user.id,
