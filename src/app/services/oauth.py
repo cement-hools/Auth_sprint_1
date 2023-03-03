@@ -1,6 +1,5 @@
 import secrets
 import string
-from datetime import datetime
 
 from flask import request
 
@@ -41,13 +40,5 @@ def login_yandex_user(account_user: yandex.User):
         return jwt_tokens
 
     user = social_account.user
-    jwt_tokens = create_access_and_refresh_jwt(user)
-    login_history = LoginHistory(
-        user_id=user.id,
-        ip=request.environ.get("HTTP_X_REAL_IP", request.remote_addr),
-        user_agent=request.headers.get("User-Agent"),
-        datetime=datetime.now(),
-    )
-    db.session.add(login_history)
-    db.session.commit()
+    jwt_tokens = login(user.login, "", is_social_auth=True).data
     return jwt_tokens
