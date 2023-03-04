@@ -1,6 +1,6 @@
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from settings import MIGRATION_DIR, pg_settings
+from app.settings.core import MIGRATION_DIR, pg_settings
 from sqlalchemy import MetaData
 
 from flask import Flask

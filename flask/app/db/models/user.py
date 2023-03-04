@@ -50,7 +50,9 @@ class User(db.Model):
     def password(self, password):
         self.password_hash = generate_password_hash(password).decode("utf8")
 
-    def verify_password(self, password):
+    def verify_password(self, password=None):
+        if not password:
+            return False
         return check_password_hash(self.password_hash, password)
 
 

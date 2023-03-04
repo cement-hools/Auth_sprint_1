@@ -6,20 +6,24 @@ from flask import Flask
 from app.jwt_app import jwt, jwt_redis_blocklist
 from app.utils import after_request_log, before_request_log
 from cli_commands import create_user
-from settings import (
-    OAuthYandexSettings,
+from app.settings.core import (
     flask_settings,
-    jwt_settings,
     redis_settings,
 )
+from app.settings.auth import jwt_settings
+from app.settings.oauth import OAuthYandexSettings, OAuthGoogleSettings
+from app.settings.logging import logger, InterceptHandler
 
 oauth = OAuth()
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="templates")
     app.config["JSON_AS_ASCII"] = False
     app.config["SECRET_KEY"] = flask_settings.secret_key
+
+    # Logging
+    app.logger.addHandler(InterceptHandler())
 
     # JWT
     app.config["JWT_SECRET_KEY"] = jwt_settings.secret_key
@@ -47,9 +51,16 @@ def create_app():
     # CLI
     app.cli.add_command(create_user)
 
+    # OAuth providers init
     app.config.update(OAuthYandexSettings().dict())
+    app.config.update(OAuthGoogleSettings().dict())
     oauth.init_app(app)
     oauth.register(name="yandex")
+    oauth.register(
+        name="google",
+        server_metadata_url=OAuthGoogleSettings().CONF_URL,
+        client_kwargs={"scope": "openid email profile"},
+    )
 
     return app
 

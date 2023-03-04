@@ -81,56 +81,14 @@ services:
 # AUTH SERVICES (Flask)
 
   redis-auth:
-    image: redis:6.2.6
-    volumes:
-      - redis_auth_data:/data
-    command: >
-      --requirepass ${REDIS_PASSWORD} --appendonly yes --port ${REDIS_PORT}
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    env_file: .env
-    healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-      interval: 1s
-      timeout: 3s
-      retries: 5
 
   postgres-auth:
-    image: postgres:15
-    volumes:
-      - postgres_auth_data:/var/lib/postgresql/data/
-      - ./tests/functional/test_data/create_data.sql:/docker-entrypoint-initdb.d/create_data.sql
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    command: -p ${POSTGRES_PORT}
-    hostname: ${POSTGRES_HOST}
     ports:
-      - "${POSTGRES_PORT}"
-    env_file: .env
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
   api-auth:
-    build: ./flask
-    hostname: ${FLASK_HOST}
-    command: >
-      gunicorn main:app --bind ${FLASK_HOST}:${FLASK_PORT}
     ports:
-      - "${FLASK_PORT}"
-    env_file: .env
-    depends_on:
-      postgres-auth:
-        condition: service_healthy
-      redis-auth:
-        condition: service_healthy
+      - "${FLASK_PORT}:${FLASK_PORT}"
 
-volumes:
-  postgres_auth_data:
-  postgres_fa_data:
-  redis_auth_data:

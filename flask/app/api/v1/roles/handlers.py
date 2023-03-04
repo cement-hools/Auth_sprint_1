@@ -3,7 +3,7 @@ from http import HTTPStatus
 from app.api.v1.roles_authorization import requires_admin
 from app.services import roles as roles_service
 from flask_dantic import serialize
-from settings import logger
+from app.settings.logging import logger
 
 from flask import Blueprint
 
