@@ -59,7 +59,7 @@ def create_app():
     oauth.register(
         name="google",
         server_metadata_url=OAuthGoogleSettings().CONF_URL,
-        client_kwargs={"scope": "openid email profile"},
+        client_kwargs={"scope": OAuthGoogleSettings().scope},
     )
 
     return app

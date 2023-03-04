@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from app.settings.core import settings
+from core.config import settings
 from db.elastic import get_async_search, AsyncFulltextSearch
 from fastapi import Depends
 from models.filters import PaginationFilter, QueryFilter

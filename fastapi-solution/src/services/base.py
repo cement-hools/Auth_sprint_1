@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from elasticsearch import AsyncElasticsearch
 
-from app.settings.core import settings
+from core.config import settings
 from db.elastic import AsyncESearch
 from db.base import AsyncFulltextSearch
 

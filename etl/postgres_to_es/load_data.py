@@ -17,7 +17,7 @@ from ps_to_es import (
     generate_person_actions,
 )
 from psycopg2.extras import RealDictCursor
-from app.settings.core import settings
+from settings import settings
 from sqlite_functions import get_lsl_from_sqlite, save_to_sqlite
 
 logger = logging.getLogger(__name__)
