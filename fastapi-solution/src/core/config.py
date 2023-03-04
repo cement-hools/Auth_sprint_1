@@ -1,7 +1,7 @@
 import logging
 from logging import config as logging_config
 
-from core.logger import LOGGING
+from app.settings.core import LOGGING
 from pydantic import BaseSettings, Field, RedisDsn
 
 # Применяем настройки логирования

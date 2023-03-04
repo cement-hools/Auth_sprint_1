@@ -1,36 +1,11 @@
-import re
-import sys
 from pathlib import Path
 
 from dotenv import find_dotenv
-from loguru import logger as loguru_logger
 from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn
 
-logger = loguru_logger
-logger.remove()
 
-BASE_DIR = Path(__file__).resolve().parent
-
-MIGRATION_DIR = BASE_DIR / "app" / "db" / "migrations"
-
-
-def obfuscate_message(message: str):
-    """Obfuscate sensitive information."""
-    result = re.sub(r"password': '.*?'", "password': [obfuscated]", message)
-    result = re.sub(
-        r"token[\"\']: [\"\'].*?[\"\']", 'token": [obfuscated]', result
-    )
-    return result
-
-
-def formatter(record):
-    record["extra"]["obfuscated_message"] = obfuscate_message(
-        record["message"]
-    )
-    return "[{level}] {time} | {extra[obfuscated_message]}\n{exception}"
-
-
-logger.add(sys.stderr, format=formatter)
+BASE_DIR = Path(__file__).resolve().parent.parent
+MIGRATION_DIR = BASE_DIR / "db" / "migrations"
 
 
 class PrimaryConfig:
@@ -54,17 +29,6 @@ class FlaskSettings(BaseSettings):
 
     class Config(PrimaryConfig):
         env_prefix = "FLASK_"
-
-
-class JWTSettings(BaseSettings):
-    """Настройки JWT."""
-
-    secret_key: str = Field(repr=False)
-    access_token_expires_hours: int = Field(default=1)
-    refresh_token_expires_days: int = Field(default=30)
-
-    class Config(PrimaryConfig):
-        env_prefix = "JWT_"
 
 
 class PGSettings(BaseSettings):
@@ -92,22 +56,7 @@ class UserRoles(BaseSettings):
     user: str = "user"
 
 
-class OAuthYandexSettings(BaseSettings):
-    """Настройки OAuth Яндекс."""
-
-    YANDEX_CLIENT_ID: str
-    YANDEX_CLIENT_SECRET: str
-    YANDEX_ACCESS_TOKEN_URL: str
-    YANDEX_AUTHORIZE_URL: str
-
-    class Config(PrimaryConfig):
-        env_prefix = "OAUTH_"
-
-
 flask_settings = FlaskSettings()
-jwt_settings = JWTSettings()
 pg_settings = PGSettings()
 redis_settings = RedisSettings()
 user_roles_settings = UserRoles()
-
-logger.debug(flask_settings)

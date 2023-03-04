@@ -1,4 +1,4 @@
-from settings import logger
+from app.settings.logging import logger
 
 from flask import request
 

@@ -12,7 +12,7 @@ from app.api.v1.auth.schemas import (
 from app.services import auth
 from flask_jwt_extended import current_user, get_jti, get_jwt, jwt_required
 
-from flask import Blueprint, request
+from flask import Blueprint, request, render_template, url_for
 
 from ..schemas import BaseResponse
 from ..utils import get_body
@@ -171,3 +171,10 @@ def user_roles_list():
         BaseResponse(success=result.success, data=data).dict(),
         HTTPStatus.OK,
     )
+
+
+@router.route("/select_login_method", methods=["GET"])
+@jwt_required(optional=True)
+def select_login_method():
+    user = current_user
+    return render_template("select_login_method.html", user=user)

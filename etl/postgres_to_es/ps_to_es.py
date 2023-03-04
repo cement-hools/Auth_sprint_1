@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from db_query import full_load, load_person_q, query_all_genre
 from pydantic import BaseModel, Field
-from settings import settings
+from app.settings.core import settings
 
 
 def es_create_show_index(client):
@@ -10,81 +10,81 @@ def es_create_show_index(client):
     client.indices.create(
         index=settings.show_index_name,
         body={
-            'settings': settings.es_common_index_settings,
-            'mappings': {
-                'dynamic': 'strict',
-                'properties': {
-                    'id': {
-                        'type': 'keyword',
+            "settings": settings.es_common_index_settings,
+            "mappings": {
+                "dynamic": "strict",
+                "properties": {
+                    "id": {
+                        "type": "keyword",
                     },
-                    'imdb_rating': {
-                        'type': 'float',
+                    "imdb_rating": {
+                        "type": "float",
                     },
-                    'genres': {
-                        'type': 'nested',
-                        'dynamic': 'strict',
-                        'properties': {
-                            'id': {
-                                'type': 'keyword',
+                    "genres": {
+                        "type": "nested",
+                        "dynamic": "strict",
+                        "properties": {
+                            "id": {
+                                "type": "keyword",
                             },
-                            'name': {
-                                'type': 'text',
-                                'analyzer': 'ru_en',
+                            "name": {
+                                "type": "text",
+                                "analyzer": "ru_en",
                             },
-                            'description': {
-                                'type': 'text',
-                                'analyzer': 'ru_en',
-                            },
-                        },
-                    },
-                    'title': {
-                        'type': 'text',
-                        'analyzer': 'ru_en',
-                        'fields': {
-                            'raw': {
-                                'type': 'keyword',
+                            "description": {
+                                "type": "text",
+                                "analyzer": "ru_en",
                             },
                         },
                     },
-                    'description': {
-                        'type': 'text',
-                        'analyzer': 'ru_en',
-                    },
-                    'director': {
-                        'type': 'text',
-                        'analyzer': 'ru_en',
-                    },
-                    'actors_names': {
-                        'type': 'text',
-                        'analyzer': 'ru_en',
-                    },
-                    'writers_names': {
-                        'type': 'text',
-                        'analyzer': 'ru_en',
-                    },
-                    'actors': {
-                        'type': 'nested',
-                        'dynamic': 'strict',
-                        'properties': {
-                            'id': {
-                                'type': 'keyword',
-                            },
-                            'full_name': {
-                                'type': 'text',
-                                'analyzer': 'ru_en',
+                    "title": {
+                        "type": "text",
+                        "analyzer": "ru_en",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword",
                             },
                         },
                     },
-                    'writers': {
-                        'type': 'nested',
-                        'dynamic': 'strict',
-                        'properties': {
-                            'id': {
-                                'type': 'keyword',
+                    "description": {
+                        "type": "text",
+                        "analyzer": "ru_en",
+                    },
+                    "director": {
+                        "type": "text",
+                        "analyzer": "ru_en",
+                    },
+                    "actors_names": {
+                        "type": "text",
+                        "analyzer": "ru_en",
+                    },
+                    "writers_names": {
+                        "type": "text",
+                        "analyzer": "ru_en",
+                    },
+                    "actors": {
+                        "type": "nested",
+                        "dynamic": "strict",
+                        "properties": {
+                            "id": {
+                                "type": "keyword",
                             },
-                            'full_name': {
-                                'type': 'text',
-                                'analyzer': 'ru_en',
+                            "full_name": {
+                                "type": "text",
+                                "analyzer": "ru_en",
+                            },
+                        },
+                    },
+                    "writers": {
+                        "type": "nested",
+                        "dynamic": "strict",
+                        "properties": {
+                            "id": {
+                                "type": "keyword",
+                            },
+                            "full_name": {
+                                "type": "text",
+                                "analyzer": "ru_en",
                             },
                         },
                     },
@@ -100,21 +100,15 @@ def es_create_genre_index(client):
     client.indices.create(
         index=settings.genre_index_name,
         body={
-            'settings': settings.es_common_index_settings,
-            'mappings': {
-                'dynamic': 'strict',
-                'properties': {
-                    'id': {
-                        'type': 'keyword',
+            "settings": settings.es_common_index_settings,
+            "mappings": {
+                "dynamic": "strict",
+                "properties": {
+                    "id": {
+                        "type": "keyword",
                     },
-                    'name': {
-                        'type': 'text',
-                        "analyzer": "ru_en"
-                    },
-                    'description': {
-                        'type': 'text',
-                        "analyzer": "ru_en"
-                    }
+                    "name": {"type": "text", "analyzer": "ru_en"},
+                    "description": {"type": "text", "analyzer": "ru_en"},
                 },
             },
         },
@@ -127,17 +121,14 @@ def es_create_person_index(client):
     client.indices.create(
         index=settings.person_index_name,
         body={
-            'settings': settings.es_common_index_settings,
-            'mappings': {
-                'dynamic': 'strict',
-                'properties': {
-                    'id': {
-                        'type': 'keyword',
+            "settings": settings.es_common_index_settings,
+            "mappings": {
+                "dynamic": "strict",
+                "properties": {
+                    "id": {
+                        "type": "keyword",
                     },
-                    'full_name': {
-                        'type': 'text',
-                        "analyzer": "ru_en"
-                    }
+                    "full_name": {"type": "text", "analyzer": "ru_en"},
                 },
             },
         },
@@ -159,8 +150,9 @@ class Genre(BaseModel):
 class EsDataclass(BaseModel):
     class Config:
         allow_population_by_field_name = True
+
     id: str
-    underscore_id: str = Field(alias='_id')  # публичное имя
+    underscore_id: str = Field(alias="_id")  # публичное имя
     imdb_rating: float | None = Field(None, ge=0, le=10)
     genres: list[Genre] | None = None
     title: str | None = None
@@ -175,8 +167,9 @@ class EsDataclass(BaseModel):
 class EsDataclassGenre(BaseModel):
     class Config:
         allow_population_by_field_name = True
+
     id: str
-    underscore_id: str = Field(alias='_id')
+    underscore_id: str = Field(alias="_id")
     name: str | None = None
     description: str | None = None
 
@@ -184,8 +177,9 @@ class EsDataclassGenre(BaseModel):
 class EsDataclassPerson(BaseModel):
     class Config:
         allow_population_by_field_name = True
+
     id: str
-    underscore_id: str = Field(alias='_id')
+    underscore_id: str = Field(alias="_id")
     full_name: str | None = None
 
 
@@ -194,46 +188,46 @@ def validate_row_create_es_doc(row):
 
     def dict_from_persons_str(string):
         return {
-            'id': (string.split(':::'))[0],
-            'role': (string.split(':::'))[1],
-            'full_name': (string.split(':::'))[2],
+            "id": (string.split(":::"))[0],
+            "role": (string.split(":::"))[1],
+            "full_name": (string.split(":::"))[2],
         }
 
     def _genre_from_genres_str(string):
-        return Genre(id=string.split(':::')[0], name=string.split(':::')[1])
+        return Genre(id=string.split(":::")[0], name=string.split(":::")[1])
 
-    if row['persons'][0] is not None:
-        persons = [dict_from_persons_str(p) for p in row['persons']]
+    if row["persons"][0] is not None:
+        persons = [dict_from_persons_str(p) for p in row["persons"]]
         directors = [
-            Person(
-                id=p['id'],
-                full_name=p['full_name']) for p in persons if p['role'] == 'director'
+            Person(id=p["id"], full_name=p["full_name"])
+            for p in persons
+            if p["role"] == "director"
         ]
         actors = [
-            Person(
-                id=p['id'],
-                full_name=p['full_name']) for p in persons if p['role'] == 'actor'
+            Person(id=p["id"], full_name=p["full_name"])
+            for p in persons
+            if p["role"] == "actor"
         ]
         writers = [
-            Person(
-                id=p['id'],
-                full_name=p['full_name']) for p in persons if p['role'] == 'writer'
+            Person(id=p["id"], full_name=p["full_name"])
+            for p in persons
+            if p["role"] == "writer"
         ]
     else:
         directors = actors = writers = []
 
-    if row['genres'][0] is not None:
-        genres = [_genre_from_genres_str(g) for g in row['genres']]
+    if row["genres"][0] is not None:
+        genres = [_genre_from_genres_str(g) for g in row["genres"]]
     else:
         genres = []
 
     return EsDataclass(
-        id=row['id'],
-        _id=row['id'],
-        imdb_rating=row['imdb_rating'],
+        id=row["id"],
+        _id=row["id"],
+        imdb_rating=row["imdb_rating"],
         genres=genres,
-        title=row['title'],
-        description=row['description'],
+        title=row["title"],
+        description=row["description"],
         director=[p.full_name for p in directors],
         actors_names=[p.full_name for p in actors],
         writers_names=[p.full_name for p in writers],
@@ -245,19 +239,17 @@ def validate_row_create_es_doc(row):
 def validate_row_create_es_doc_genre(row):
     """Метод преобразования жанров из PG в ES построчно"""
     return EsDataclassGenre(
-        id=row['id'],
-        _id=row['id'],
-        name=row['name'],
-        description=row['description']
+        id=row["id"],
+        _id=row["id"],
+        name=row["name"],
+        description=row["description"],
     ).dict(by_alias=True)
 
 
 def validate_row_create_es_doc_person(row):
     """Метод преобразования данных из PG в ES построчно"""
     return EsDataclassPerson(
-        id=row['id'],
-        _id=row['id'],
-        full_name=row['full_name']
+        id=row["id"], _id=row["id"], full_name=row["full_name"]
     ).dict(by_alias=True)
 
 
