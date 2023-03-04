@@ -20,9 +20,7 @@ def callback():
 
     if result.error_message:
         return (
-            BaseResponse(
-                success=False, error="Wrong username or password"
-            ).dict(),
+            BaseResponse(success=False, error=result.error_message).dict(),
             HTTPStatus.UNAUTHORIZED,
         )
     else:
