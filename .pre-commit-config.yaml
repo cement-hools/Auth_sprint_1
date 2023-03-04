@@ -4,11 +4,6 @@ repos:
     rev: v2.0.1
     hooks:
     -   id: autoflake
--   repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.10.1
-    hooks:
-    - id: isort
-      additional_dependencies: ["pipreqs==0.4.11", "pip-api==0.0.30"]
 -   repo: https://github.com/ambv/black
     rev: 23.1.0
     hooks:
@@ -18,3 +13,4 @@ repos:
     rev: 6.0.0
     hooks:
     - id: flake8
+      args: ['--config=.flake8']
