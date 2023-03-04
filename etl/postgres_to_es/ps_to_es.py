@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from db_query import full_load, load_person_q, query_all_genre
 from pydantic import BaseModel, Field
-from app.settings.core import settings
+from settings import settings
 
 
 def es_create_show_index(client):

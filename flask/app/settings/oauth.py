@@ -20,6 +20,7 @@ class OAuthGoogleSettings(BaseSettings):
     CONF_URL: AnyUrl = (
         "https://accounts.google.com/.well-known/openid-configuration"
     )
+    scope: str = "openid email profile"
 
     class Config(PrimaryConfig):
         env_prefix = "OAUTH_"

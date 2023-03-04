@@ -2,7 +2,7 @@ from elasticsearch import AsyncElasticsearch, NotFoundError
 from db.base import AsyncFulltextSearch
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MultiMatch
-from app.settings.core import settings
+from core.config import settings
 
 es: AsyncFulltextSearch | None = None
 

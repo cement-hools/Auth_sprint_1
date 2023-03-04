@@ -12,7 +12,7 @@ from load_data import (
     es_create_show_index,
 )
 from ps_to_es import EsDataclass, EsDataclassGenre, EsDataclassPerson
-from app.settings.core import settings
+from settings import settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

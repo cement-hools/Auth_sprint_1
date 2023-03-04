@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from app.settings.core import settings
+from core.config import settings
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_cache.decorator import cache
 from models.filters import PaginationFilter, QueryFilter

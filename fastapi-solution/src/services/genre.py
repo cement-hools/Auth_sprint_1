@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from app.settings.core import settings
+from core.config import settings
 from db.base import AsyncFulltextSearch
 from db.elastic import get_async_search
 from fastapi import Depends
