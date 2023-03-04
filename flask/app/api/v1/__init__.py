@@ -1,10 +1,10 @@
 from http import HTTPStatus
 
-from app.api.v1 import auth, roles
-from app.jwt_app import jwt
+from flask import Blueprint
 from werkzeug.exceptions import HTTPException
 
-from flask import Blueprint
+from app.api.v1 import auth, roles, oauth
+from app.jwt_app import jwt
 
 from .schemas import BaseResponse
 
@@ -12,6 +12,7 @@ bp = Blueprint("v1", __name__, url_prefix="/api/v1")
 
 bp.register_blueprint(auth.router)
 bp.register_blueprint(roles.router)
+bp.register_blueprint(oauth.router)
 
 
 @bp.errorhandler(HTTPException)
