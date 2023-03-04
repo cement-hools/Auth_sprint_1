@@ -10,7 +10,7 @@ class JWTStore(db.Model):
     __tablename__ = "jwt_store"
 
     id = db.Column(
-        UUID(as_uuid=True),
+        db.UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
         unique=True,
@@ -20,5 +20,5 @@ class JWTStore(db.Model):
 
     jwt_id = db.Column(db.String(36), nullable=False, index=True)
     expiration_date = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(UUID, ForeignKey(User.id))
+    user_id = db.Column(db.UUID, db.ForeignKey(User.id, ondelete="CASCADE"))
     type = db.Column(db.String(32), nullable=False)

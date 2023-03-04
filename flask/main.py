@@ -1,8 +1,9 @@
-from app import create_app
 from gevent import monkey
-from settings import flask_settings
 
 monkey.patch_all()
+
+from app import create_app  # noqa E402
+from settings import flask_settings  # noqa E402
 
 app = create_app()
 

@@ -85,9 +85,29 @@ class RedisSettings(BaseSettings):
         env_prefix = "REDIS_"
 
 
+class UserRoles(BaseSettings):
+    """Setting up basic app roles uuids"""
+
+    admin: str = "admin"
+    user: str = "user"
+
+
+class OAuthYandexSettings(BaseSettings):
+    """Настройки OAuth Яндекс."""
+
+    YANDEX_CLIENT_ID: str
+    YANDEX_CLIENT_SECRET: str
+    YANDEX_ACCESS_TOKEN_URL: str
+    YANDEX_AUTHORIZE_URL: str
+
+    class Config(PrimaryConfig):
+        env_prefix = "OAUTH_"
+
+
 flask_settings = FlaskSettings()
 jwt_settings = JWTSettings()
 pg_settings = PGSettings()
 redis_settings = RedisSettings()
+user_roles_settings = UserRoles()
 
 logger.debug(flask_settings)

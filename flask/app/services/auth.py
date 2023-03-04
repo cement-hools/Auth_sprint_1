@@ -1,15 +1,10 @@
 from datetime import datetime
 
+from flask import request
+
 from app.db import db
 from app.db.models.jwt import JWTStore
 from app.db.models.user import LoginHistory, User
-from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
-    get_jti,
-)
-
-from flask import current_app, request
 
 from .auth_utils import create_access_and_refresh_jwt, invalidate_jwt
 from .schemas import ServiceResult
@@ -39,25 +34,28 @@ def registration(
 
 
 def login(
-    login: str,
-    password: str,
+    login: str, password: str, is_social_auth: bool = False
 ) -> ServiceResult:
     user = User.query.filter_by(login=login).one_or_none()
-    if not user or not user.verify_password(password):
-        error_message = "Wrong username or password"
-        return ServiceResult(success=False, error_message=error_message)
 
-    db.session.add(
-        LoginHistory(
-            user_id=user.id,
-            ip=request.environ.get("HTTP_X_REAL_IP", request.remote_addr),
-            user_agent=request.headers.get("User-Agent"),
-            datetime=datetime.now(),
-        )
-    )
-    db.session.commit()
-    jwt_tokens = create_access_and_refresh_jwt(user)
-    return ServiceResult(success=True, data=jwt_tokens)
+    if user:
+        if user.verify_password(password) or is_social_auth:
+            db.session.add(
+                LoginHistory(
+                    user_id=user.id,
+                    ip=request.environ.get(
+                        "HTTP_X_REAL_IP", request.remote_addr
+                    ),
+                    user_agent=request.headers.get("User-Agent"),
+                    datetime=datetime.now(),
+                )
+            )
+            db.session.commit()
+            jwt_tokens = create_access_and_refresh_jwt(user)
+            return ServiceResult(success=True, data=jwt_tokens)
+
+    error_message = "Wrong login or password"
+    return ServiceResult(success=False, error_message=error_message)
 
 
 def password_change(
