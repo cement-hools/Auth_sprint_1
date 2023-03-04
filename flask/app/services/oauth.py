@@ -20,6 +20,7 @@ def _social_login_or_register(
     email: str,
     social_id: str,
     social_name: str,
+    social_login: str = None,
 ):
     social_account = SocialAccount.query.filter(
         SocialAccount.social_id == social_id,
@@ -46,7 +47,7 @@ def _social_login_or_register(
             user = User.query.filter_by(email=email).one_or_none()
         else:  # We do not have an account with this email, try to create
             registration_attempt = registration(
-                login=_create_random_alphanumeric_string(),
+                login=social_login or _create_random_alphanumeric_string(),
                 email=email,
                 password=_create_random_alphanumeric_string(),
             )
@@ -83,6 +84,7 @@ def login_yandex_user(account_user: yandex.User):
         email=account_user.email,
         social_id=account_user.id,
         social_name=account_user.social_name,
+        social_login=account_user.login,
     )
 
 
