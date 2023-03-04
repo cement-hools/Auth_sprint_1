@@ -39,10 +39,7 @@ def login(
     user = User.query.filter_by(login=login).one_or_none()
 
     if user:
-        is_verify_password = (
-            user.verify_password(password) if not is_social_auth else True
-        )
-        if is_verify_password:
+        if user.verify_password(password) or is_social_auth:
             db.session.add(
                 LoginHistory(
                     user_id=user.id,
