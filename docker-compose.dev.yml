@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+# AUTH SERVICES (Flask)
+
+  redis-auth:
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+
+  postgres-auth:
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+  api-auth:
+    ports:
+      - "${FLASK_PORT}:${FLASK_PORT}"
+

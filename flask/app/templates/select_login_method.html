@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login method selection</title>
+</head>
+<body>
+{% if user %}
+<pre>
+{{ user|tojson }}
+</pre>
+{% else %}
+<ul>
+    <li><a href='{{ url_for("v1.oauth.google.login") }}'>Login with Google</a></li>
+    <li><a href='{{ url_for("v1.oauth.yandex.login") }}'>Login with Yandex</a></li>
+</ul>
+{% endif %}
+</body>
+</html>

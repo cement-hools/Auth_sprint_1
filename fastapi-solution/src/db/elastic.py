@@ -26,17 +26,17 @@ class AsyncESearch(AsyncFulltextSearch):
             doc = await self.db.get(index=index, id=id)
         except NotFoundError:
             return None
-        return doc['_source']
+        return doc["_source"]
 
     @classmethod
     def _paginate_es_query(
-            self, query: Search, page_size: int, page_number: int
+        self, query: Search, page_size: int, page_number: int
     ) -> Search:
         start = (page_number - 1) * page_size
-        return query[start: start + page_size]
+        return query[start : start + page_size]
 
     async def get_many_with_query_filter_sort_pagination(
-            self, index: str, query, index_filter, sort, pagination
+        self, index: str, query, index_filter, sort, pagination
     ):
         if sort is None:
             sort = []
@@ -45,29 +45,29 @@ class AsyncESearch(AsyncFulltextSearch):
         es_query = Search()
         if index_filter and index_filter.genre_id:
             es_query = es_query.filter(
-                'nested',
-                path='genres',
-                query=Q('term', genres__id=index_filter.genre_id)
+                "nested",
+                path="genres",
+                query=Q("term", genres__id=index_filter.genre_id),
             )
         if query.query:
             es_query = es_query.query(
                 MultiMatch(
                     query=query.query,
                     fields=query.query_fields,
-                    fuzziness=settings.search_fuzziness
+                    fuzziness=settings.search_fuzziness,
                 )
             )
         query_body = self._paginate_es_query(
             query=es_query,
             page_size=pagination.page_size,
-            page_number=pagination.page_number
+            page_number=pagination.page_number,
         ).to_dict()
         search = await self.db.search(
             index=index,
             body=query_body,
             sort=sort,
         )
-        items = [hit['_source'] for hit in search['hits']['hits']]
+        items = [hit["_source"] for hit in search["hits"]["hits"]]
         return items
 
     async def close(self):

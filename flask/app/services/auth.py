@@ -34,12 +34,23 @@ def registration(
 
 
 def login(
-    login: str, password: str, is_social_auth: bool = False
+    login: str | None,
+    password: str | None,
+    email: str = None,
+    is_social_auth: bool = False,
 ) -> ServiceResult:
-    user = User.query.filter_by(login=login).one_or_none()
+    if login and email:
+        error_message = "Login with email OR login, not both"
+        return ServiceResult(success=False, error_message=error_message)
+
+    user = None
+    if login:
+        user = User.query.filter_by(login=login).one_or_none()
+    if email:
+        user = User.query.filter_by(email=email).one_or_none()
 
     if user:
-        if user.verify_password(password) or is_social_auth:
+        if is_social_auth or user.verify_password(password):
             db.session.add(
                 LoginHistory(
                     user_id=user.id,

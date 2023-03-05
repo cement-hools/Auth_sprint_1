@@ -6,8 +6,11 @@ from elasticsearch.helpers import streaming_bulk
 from faker import Faker
 from tqdm import tqdm
 
-from load_data import (es_create_genre_index, es_create_person_index,
-                       es_create_show_index)
+from load_data import (
+    es_create_genre_index,
+    es_create_person_index,
+    es_create_show_index,
+)
 from ps_to_es import EsDataclass, EsDataclassGenre, EsDataclassPerson
 from settings import settings
 
@@ -24,21 +27,21 @@ NUM_PERSONS = 1000000
 NUM_SHOWS = 400000
 
 # Generate genres
-fake = Faker(['en_US'])
+fake = Faker(["en_US"])
 fake_genre_names = zip(
-    fake.words(nb=NUM_GENRES, part_of_speech='adjective', unique=True),
-    fake.words(nb=NUM_GENRES, part_of_speech='noun', unique=True),
+    fake.words(nb=NUM_GENRES, part_of_speech="adjective", unique=True),
+    fake.words(nb=NUM_GENRES, part_of_speech="noun", unique=True),
 )
-fake_genre_names = [' '.join(g).capitalize() for g in list(fake_genre_names)]
+fake_genre_names = [" ".join(g).capitalize() for g in list(fake_genre_names)]
 fake_genres = []
 for fg in fake_genre_names:
     id = fake.uuid4()
     fake_genres.append(EsDataclassGenre(id=id, underscore_id=id, name=fg))
 
 # Generate persons
-fake = Faker(['en_US', 'ru_RU'])
+fake = Faker(["en_US", "ru_RU"])
 fake_persons = []
-for _ in tqdm(range(NUM_PERSONS), desc='Generating persons'):
+for _ in tqdm(range(NUM_PERSONS), desc="Generating persons"):
     id = fake.uuid4()
     fake_persons.append(
         EsDataclassPerson(id=id, underscore_id=id, full_name=fake.name())
@@ -77,16 +80,9 @@ def generate_fake_person(fake_persons):
         yield fp.dict(by_alias=True)
 
 
-def push_fake_data_to_elastic(
-        es_client,
-        index,
-        action,
-        total_number
-):
+def push_fake_data_to_elastic(es_client, index, action, total_number):
     progress = tqdm(
-        unit="docs",
-        desc=f'Pushing data to {index}',
-        total=total_number
+        unit="docs", desc=f"Pushing data to {index}", total=total_number
     )
     successes = 0
 
@@ -100,30 +96,31 @@ def push_fake_data_to_elastic(
     ):
         progress.update(1)
         if not ok:
-            logger.error(f'Error while streaming fake data to {index}')
+            logger.error(f"Error while streaming fake data to {index}")
         successes += ok
         logger.debug(action)
 
 
-es_client = Elasticsearch(
-    hosts=settings.elastic_dsn
-)
+es_client = Elasticsearch(hosts=settings.elastic_dsn)
 es_create_genre_index(es_client)
 es_create_person_index(es_client)
 es_create_show_index(es_client)
 
 push_fake_data_to_elastic(
-    es_client, settings.genre_index_name,
-    generate_fake_genre(fake_genres), NUM_GENRES
+    es_client,
+    settings.genre_index_name,
+    generate_fake_genre(fake_genres),
+    NUM_GENRES,
 )
 push_fake_data_to_elastic(
-    es_client, settings.person_index_name,
+    es_client,
+    settings.person_index_name,
     generate_fake_person(fake_persons),
-    NUM_PERSONS
+    NUM_PERSONS,
 )
 push_fake_data_to_elastic(
     es_client,
     settings.show_index_name,
     generate_fake_show(fake_persons, fake_genres),
-    NUM_SHOWS
+    NUM_SHOWS,
 )

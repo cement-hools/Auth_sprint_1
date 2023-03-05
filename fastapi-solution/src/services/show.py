@@ -12,7 +12,7 @@ class ShowService(BaseService):
     def __init__(self, async_search_db: AsyncFulltextSearch):
         self.async_search_db = async_search_db
         self.single_item_model = Show
-        self.index_name = settings.service_index_map['show']
+        self.index_name = settings.service_index_map["show"]
 
     async def get_by_id(self, id: str) -> Show | None:
         item = await self.async_search_db.get_by_id(self.index_name, id)
@@ -21,18 +21,18 @@ class ShowService(BaseService):
         return None
 
     async def get_many_with_query_filter_sort_pagination(
-            self,
-            query: QueryFilter = Depends(),
-            index_filter: ShowGenreFilter = Depends(),
-            sort: ShowSortFilter = Depends(),
-            pagination: PaginationFilter = Depends(),
+        self,
+        query: QueryFilter = Depends(),
+        index_filter: ShowGenreFilter = Depends(),
+        sort: ShowSortFilter = Depends(),
+        pagination: PaginationFilter = Depends(),
     ) -> list[Show] | None:
         query.query_fields = [  # Changes here will break search tests
-            'title^10',
-            'description^4',
-            'actors_names^3',
-            'director^2',
-            'writers_names^1',
+            "title^10",
+            "description^4",
+            "actors_names^3",
+            "director^2",
+            "writers_names^1",
         ]
 
         items = await self.async_search_db.get_many_with_query_filter_sort_pagination(
@@ -45,6 +45,6 @@ class ShowService(BaseService):
 
 @lru_cache()
 def get_show_service(
-        async_search_db: AsyncFulltextSearch = Depends(get_async_search)
+    async_search_db: AsyncFulltextSearch = Depends(get_async_search),
 ) -> ShowService:
     return ShowService(async_search_db)

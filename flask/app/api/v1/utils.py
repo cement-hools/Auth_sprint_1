@@ -1,7 +1,7 @@
 from typing import Type
 
 from pydantic import BaseModel, ValidationError
-from settings import logger
+from app.settings.logging import logger
 
 from flask import abort, request
 

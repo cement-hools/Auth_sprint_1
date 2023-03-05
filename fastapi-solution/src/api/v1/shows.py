@@ -15,15 +15,15 @@ class SingleShowAPIResponse(Show):
 
 
 # TODO: документировать параметры
-@router.get('', response_model=list[Show] | None)
-@router.get('/search', response_model=list[Show] | None)
+@router.get("", response_model=list[Show] | None)
+@router.get("/search", response_model=list[Show] | None)
 @cache(expire=settings.cache_expiration_in_seconds)
 async def show_list(
-        query_filter: QueryFilter = Depends(),
-        show_sort_filter: ShowSortFilter = Depends(),
-        show_genre_filter: ShowGenreFilter = Depends(),
-        pagination_filter: PaginationFilter = Depends(),
-        show_service: ShowService = Depends(get_show_service),
+    query_filter: QueryFilter = Depends(),
+    show_sort_filter: ShowSortFilter = Depends(),
+    show_genre_filter: ShowGenreFilter = Depends(),
+    pagination_filter: PaginationFilter = Depends(),
+    show_service: ShowService = Depends(get_show_service),
 ) -> list[Show] | None:
     """
     Gets a list of genres.
@@ -43,11 +43,11 @@ async def show_list(
     return items
 
 
-@router.get('/{show_id}', response_model=SingleShowAPIResponse)
+@router.get("/{show_id}", response_model=SingleShowAPIResponse)
 @cache(expire=settings.cache_expiration_in_seconds)
 async def show_details(
-        show_id: str,
-        show_service: ShowService = Depends(get_show_service),
+    show_id: str,
+    show_service: ShowService = Depends(get_show_service),
 ) -> SingleShowAPIResponse:
     """
     Gets a single show by its ID.
@@ -58,6 +58,6 @@ async def show_details(
     show = await show_service.get_by_id(show_id)
     if not show:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='Show not found'
+            status_code=HTTPStatus.NOT_FOUND, detail="Show not found"
         )
     return SingleShowAPIResponse(**show.dict())
