@@ -9,6 +9,8 @@ from app.db.models.user import LoginHistory, User
 from .auth_utils import create_access_and_refresh_jwt, invalidate_jwt, \
     get_device_type
 from .schemas import ServiceResult
+from ..db.models import Role
+from ..settings.core import UserRoles
 
 
 def registration(
@@ -29,6 +31,9 @@ def registration(
         password=password,
     )
     db.session.add(user)
+    db.session.commit()
+    user_role = Role.query.filter_by(name=UserRoles().user).first()
+    user.roles.append(user_role)
     db.session.commit()
 
     return ServiceResult(success=True, data=user)
