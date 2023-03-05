@@ -6,10 +6,12 @@ from flask_jwt_extended import (
     create_refresh_token,
     get_jti,
 )
+from user_agents import parse
 
 from app import jwt_redis_blocklist
 from app.api.v1.auth.schemas import LoginUserResData
 from app.db import db, models
+from app.db.models import LoginHistory
 
 
 def create_access_and_refresh_jwt(user: models.User) -> LoginUserResData:
@@ -57,3 +59,17 @@ def invalidate_jwt(jti, token_type):
     elif token_type == "refresh":
         expiration_date = current_app.config["JWT_REFRESH_TOKEN_EXPIRES"]
     jwt_redis_blocklist.set(jti, "", ex=expiration_date)
+
+
+def get_device_type(user_agent_string: str):
+    """Плучить тип устройства."""
+    device_types = LoginHistory.DeviseType
+    user_agent = parse(user_agent_string)
+    if user_agent.is_mobile:
+        user_device_type = device_types.MOBILE
+    elif user_agent.is_tablet:
+        user_device_type = device_types.TABLET
+    else:
+        user_device_type = device_types.PC
+
+    return user_device_type

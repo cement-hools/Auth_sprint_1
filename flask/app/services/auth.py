@@ -6,7 +6,8 @@ from app.db import db
 from app.db.models.jwt import JWTStore
 from app.db.models.user import LoginHistory, User
 
-from .auth_utils import create_access_and_refresh_jwt, invalidate_jwt
+from .auth_utils import create_access_and_refresh_jwt, invalidate_jwt, \
+    get_device_type
 from .schemas import ServiceResult
 
 
@@ -51,6 +52,7 @@ def login(
 
     if user:
         if is_social_auth or user.verify_password(password):
+            user_device_type = get_device_type(request.user_agent.string)
             db.session.add(
                 LoginHistory(
                     user_id=user.id,
@@ -58,6 +60,7 @@ def login(
                         "HTTP_X_REAL_IP", request.remote_addr
                     ),
                     user_agent=request.headers.get("User-Agent"),
+                    user_device_type=user_device_type,
                     datetime=datetime.now(),
                 )
             )
