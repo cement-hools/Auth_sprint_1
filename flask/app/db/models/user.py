@@ -2,7 +2,7 @@ import uuid
 
 from app.db import db
 from flask_bcrypt import check_password_hash, generate_password_hash
-from sqlalchemy import UUID
+from sqlalchemy import UUID, UniqueConstraint
 
 from .role import Role
 
@@ -84,16 +84,44 @@ class SocialAccount(db.Model):
         return f"<SocialAccount {self.social_name}:{self.user_id}>"
 
 
+def create_partition(target, connection, **kw) -> None:
+    """ creating partition by user_sign_in """
+    connection.execute(
+        """CREATE TABLE IF NOT EXISTS "login_history_in_tablet" 
+        PARTITION OF "login_history" FOR VALUES IN ('tablet')"""
+    )
+    connection.execute(
+        """CREATE TABLE IF NOT EXISTS "login_history_in_mobile" 
+        PARTITION OF "login_history" FOR VALUES IN ('mobile')"""
+    )
+    connection.execute(
+        """CREATE TABLE IF NOT EXISTS "login_history_in_web" 
+        PARTITION OF "login_history" FOR VALUES IN ('web')"""
+    )
+
+
 class LoginHistory(db.Model):
     """История входа пользователя."""
 
     __tablename__ = "login_history"
+    __table_args__ = (
+        UniqueConstraint('id', 'user_device_type'),
+        {
+            'postgresql_partition_by': 'LIST (user_device_type)',
+            'listeners': [('after_create', create_partition)],
+        }
+    )
+
+    class DeviceType:
+        """Тип устройства."""
+        PC = "web"
+        MOBILE = "mobile"
+        TABLET = "tablet"
 
     id = db.Column(
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
-        unique=True,
         nullable=False,
         comment="id Записи",
     )
@@ -104,6 +132,7 @@ class LoginHistory(db.Model):
     user_agent = db.Column(
         db.Text, nullable=False, comment="User-Agent пользователя"
     )
+    user_device_type = db.Column(db.String(255), primary_key=True)
     datetime = db.Column(
         db.DateTime, nullable=False, comment="Дата и время входа"
     )
