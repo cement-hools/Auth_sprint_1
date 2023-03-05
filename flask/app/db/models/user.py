@@ -112,7 +112,7 @@ class LoginHistory(db.Model):
         }
     )
 
-    class DeviseType:
+    class DeviceType:
         """Тип устройства."""
         PC = "web"
         MOBILE = "mobile"

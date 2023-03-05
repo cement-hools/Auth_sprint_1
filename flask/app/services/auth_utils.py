@@ -62,7 +62,7 @@ def invalidate_jwt(jti, token_type):
 
 
 def get_device_type(user_agent_string: str):
-    """Плучить тип устройства."""
+    """Получить тип устройства."""
     device_types = LoginHistory.DeviseType
     user_agent = parse(user_agent_string)
     if user_agent.is_mobile:
