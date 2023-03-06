@@ -21,7 +21,7 @@ class SingleShowAPIResponse(Show):
 @router.get("/search", response_model=list[Show] | None)
 @has_role(
     role_names.user
-)  # We don't have any business logic for this role. This is just a proof of concept use of role check
+)  # We don't have any business logic for this role. This is just a proof of concept use of the @has_role decorator
 @cache(expire=settings.cache_expiration_in_seconds)
 async def show_list(
     query_filter: QueryFilter = Depends(),

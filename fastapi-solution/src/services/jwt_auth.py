@@ -1,7 +1,8 @@
 from functools import wraps
+import base64
+import json
 
-from fastapi import Depends, Header, HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, Request
 from fastapi_jwt_auth import AuthJWT
 import httpx
 
@@ -16,6 +17,31 @@ class AuthService:
 
 
 auth_service = AuthService()
+
+
+def _extract_sub(auth_header):
+    """
+    Extracts the 'sub' field from a JWT token without using external libraries.
+    TODO: use fastapi_jwt_auth for this somehow
+    """
+    token = auth_header.split(" ")[1]
+    token_parts = token.split(".")
+    payload = token_parts[1]
+
+    # add padding to the base64-encoded payload if needed
+    padding = len(payload) % 4
+    if padding > 0:
+        payload += "=" * (4 - padding)
+
+    # decode the base64-encoded payload
+    decoded_payload = base64.urlsafe_b64decode(payload)
+
+    # convert the decoded payload from bytes to a string
+    decoded_payload_str = decoded_payload.decode("utf-8")
+
+    # parse the decoded payload as JSON and extract the 'sub' field
+    payload_dict = json.loads(decoded_payload_str)
+    return payload_dict["sub"]
 
 
 async def _user_has_role(user_id, role_name, x_request_id, jwt) -> bool:
@@ -50,8 +76,10 @@ def has_role(allowed_role: str):
         @wraps(func)
         async def wrapper(*args, request: Request, **kwargs):
             headers = dict(request.headers)
+            user_id = _extract_sub(headers["authorization"])
+
             user_has_role = await _user_has_role(
-                "317d91d6-8321-47d8-9352-9886aca616d8",
+                user_id,
                 allowed_role,
                 headers["x-request-id"],
                 headers["authorization"],
