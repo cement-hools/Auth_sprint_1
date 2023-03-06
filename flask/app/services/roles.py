@@ -93,11 +93,16 @@ def delete_role_from_user(
 
 
 def check_user_role(
-    role_id: str,
+    role_name: str,
     user_id: str,
 ) -> ServiceResult:
+    role = Role.query.filter_by(name=role_name).one_or_none()
+    if not role:
+        error_message = "Role not found"
+        return ServiceResult(success=False, error_message=error_message)
+
     user_role = UserRole.query.filter_by(
-        user_id=user_id, role_id=role_id
+        user_id=user_id, role_id=role.id
     ).first()
     if not user_role:
         error_message = "User does not have this role"

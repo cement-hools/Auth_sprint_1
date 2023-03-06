@@ -1,11 +1,13 @@
 from http import HTTPStatus
 
-from app.api.v1.roles_authorization import requires_admin
+from app.api.v1.roles_authorization import requires_role
 from app.services import roles as roles_service
 from flask_dantic import serialize
 from app.settings.logging import logger
+from app.settings.core import user_roles_settings
 
 from flask import Blueprint
+from flask_jwt_extended import current_user, jwt_required
 
 from ..schemas import BaseResponse
 from ..utils import get_body
@@ -21,11 +23,9 @@ from .schemas import (
 
 router = Blueprint("role", __name__)
 
-# Admin role required for all routes in this blueprint
-router.before_request(requires_admin)
-
 
 @router.route("/roles", methods=["GET"])
+@requires_role(user_roles_settings.admin)
 def all_roles():
     """Список всех ролей."""
     roles = roles_service.roles_list().data
@@ -37,6 +37,7 @@ def all_roles():
 
 
 @router.route("/roles", methods=["POST"])
+@requires_role(user_roles_settings.admin)
 def create_role():
     """Создание роли."""
     body: CreateRoleRequest = get_body(CreateRoleRequest)
@@ -55,6 +56,7 @@ def create_role():
 
 
 @router.route("/roles/<string:role_id>", methods=["GET"])
+@requires_role(user_roles_settings.admin)
 def detail_role(role_id: str):
     """Получение роли."""
     role = roles_service.role_details(role_id).data
@@ -66,6 +68,7 @@ def detail_role(role_id: str):
 
 
 @router.route("/roles/<string:role_id>", methods=["PUT"])
+@requires_role(user_roles_settings.admin)
 def edit_role(role_id: str):
     """Редактирование роли."""
     body: UpdateRoleRequest = get_body(UpdateRoleRequest)
@@ -81,6 +84,7 @@ def edit_role(role_id: str):
 
 
 @router.route("/roles/<string:role_id>", methods=["DELETE"])
+@requires_role(user_roles_settings.admin)
 def delete_role(role_id: str):
     """Удаление роли."""
     result = roles_service.delete_role(role_id)
@@ -88,6 +92,7 @@ def delete_role(role_id: str):
 
 
 @router.route("/roles/<string:role_id>/add_user", methods=["POST"])
+@requires_role(user_roles_settings.admin)
 def add_role_to_user(role_id: str):
     """Добавление роли в пользователя."""
     body: AddUserToRoleRequest = get_body(AddUserToRoleRequest)
@@ -96,6 +101,7 @@ def add_role_to_user(role_id: str):
 
 
 @router.route("/roles/<string:role_id>/del_user", methods=["POST"])
+@requires_role(user_roles_settings.admin)
 def delete_role_from_user(role_id: str):
     """Удаление пользователя из роли."""
     body: DeleteUserFromRoleRequest = get_body(DeleteUserFromRoleRequest)
@@ -104,9 +110,15 @@ def delete_role_from_user(role_id: str):
 
 
 @router.route(
-    "/roles/<string:role_id>/<string:user_id>/check", methods=["GET"]
+    "/roles/<string:role_name>/<string:user_id>/check", methods=["GET"]
 )
-def check_user_role(role_id: str, user_id: str):
+@jwt_required()
+def check_user_role(role_name: str, user_id: str):
     """Проверка принадлежности пользователя к роли."""
-    result = roles_service.check_user_role(role_id, user_id)
-    return BaseResponse(success=result.success).dict(), HTTPStatus.OK
+    if current_user.id == user_id or roles_service.check_user_role(
+        user_roles_settings.admin, current_user.id
+    ):
+        result = roles_service.check_user_role(role_name, user_id)
+        return BaseResponse(success=result.success).dict(), HTTPStatus.OK
+    else:
+        return BaseResponse(success=False).dict(), HTTPStatus.UNAUTHORIZED

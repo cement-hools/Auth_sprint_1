@@ -14,3 +14,4 @@ psycopg2-binary~=2.9.5
 elasticsearch-dsl>=7.0.0,<8.0.0
 gunicorn~=20.1.0
 fastapi_jwt_auth~=0.5
+httpx~=0.23.3

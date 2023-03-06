@@ -1,11 +1,13 @@
 from http import HTTPStatus
 
-from core.config import settings
+from core.config import settings, role_names
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_cache.decorator import cache
 from models.filters import PaginationFilter, QueryFilter
 from models.show import Show, ShowGenreFilter, ShowSortFilter
 from services.show import ShowService, get_show_service
+from services.jwt_auth import has_role
+
 
 router = APIRouter()
 
@@ -17,6 +19,9 @@ class SingleShowAPIResponse(Show):
 # TODO: документировать параметры
 @router.get("", response_model=list[Show] | None)
 @router.get("/search", response_model=list[Show] | None)
+@has_role(
+    role_names.user
+)  # We don't have any business logic for this role. This is just a proof of concept use of role check
 @cache(expire=settings.cache_expiration_in_seconds)
 async def show_list(
     query_filter: QueryFilter = Depends(),
