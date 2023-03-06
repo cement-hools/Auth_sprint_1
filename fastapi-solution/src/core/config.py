@@ -2,7 +2,7 @@ import logging
 from logging import config as logging_config
 
 from core.logger import LOGGING
-from pydantic import BaseSettings, Field, RedisDsn
+from pydantic import BaseSettings, Field, RedisDsn, AnyUrl
 
 # Применяем настройки логирования
 logging_config.dictConfig(LOGGING)
@@ -38,6 +38,9 @@ class JWT(BaseSettings):
     authjwt_denylist_enabled: bool = True
     authjwt_denylist_token_checks: set = {"access", "refresh"}
 
+    auth_api_base_url: AnyUrl = Field(..., env="FLASK_URL")
+    auth_api_roles_check_endpoint_url: str = "/api/v1/roles/"
+
 
 class Settings(EsIndexes, Elastic, Redis, BaseSettings):
     # Название проекта. Используется в Swagger-документации
@@ -55,5 +58,11 @@ class Settings(EsIndexes, Elastic, Redis, BaseSettings):
         env_prefix = "FA_"
 
 
+class RoleSettings(BaseSettings):
+    admin: str = Field(..., env="ADMIN_ROLE_NAME")
+    user: str = Field(..., env="USER_ROLE_NAME")
+
+
 settings = Settings()
 jwt_settings = JWT()
+role_names = RoleSettings()

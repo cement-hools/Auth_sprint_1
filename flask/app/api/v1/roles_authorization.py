@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask_jwt_extended import current_user, verify_jwt_in_request
 
-from flask import abort
+from flask import abort, request
 
 
 def _has_roles_or_abort(roles):

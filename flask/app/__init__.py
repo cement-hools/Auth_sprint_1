@@ -13,6 +13,7 @@ from app.settings.core import (
 from app.settings.auth import jwt_settings
 from app.settings.oauth import OAuthYandexSettings, OAuthGoogleSettings
 from app.settings.logging import logger, InterceptHandler
+from .jaeger_app import jaeger
 
 oauth = OAuth()
 
@@ -44,6 +45,9 @@ def create_app():
 
     # Routing
     app.register_blueprint(v1.bp)
+
+    # Jaeger
+    jaeger.init_app(app)
 
     # DB
     init_db(app)
