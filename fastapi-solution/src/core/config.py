@@ -60,7 +60,7 @@ class Settings(EsIndexes, Elastic, Redis, BaseSettings):
 
 class RoleSettings(BaseSettings):
     admin: str = Field(..., env="ADMIN_ROLE_NAME")
-    user: str = Field(..., env="USER_RILE_NAME")
+    user: str = Field(..., env="USER_ROLE_NAME")
 
 
 settings = Settings()
