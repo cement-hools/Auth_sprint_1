@@ -49,7 +49,7 @@ class RedisSettings(BaseSettings):
         env_prefix = "REDIS_"
 
 
-class UserRoles(BaseSettings):
+class UserRoles:
     """Setting up basic app roles uuids"""
 
     admin: str = "admin"
