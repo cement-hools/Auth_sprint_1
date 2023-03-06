@@ -1,8 +1,7 @@
 from pathlib import Path
 
 from dotenv import find_dotenv
-from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn
-
+from pydantic import BaseSettings, Field, PostgresDsn, RedisDsn, BaseModel
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MIGRATION_DIR = BASE_DIR / "db" / "migrations"
@@ -49,7 +48,7 @@ class RedisSettings(BaseSettings):
         env_prefix = "REDIS_"
 
 
-class UserRoles:
+class UserRoles(BaseModel):
     """Setting up basic app roles uuids"""
 
     admin: str = "admin"
