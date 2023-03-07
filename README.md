@@ -21,19 +21,19 @@ make stop
 ```
 
 ### Migrations
-* apply migrations
+* Apply migrations
 ```
  flask db upgrade
 ```
-* auto generate migration
+* Auto-generate migration after a model change
 ```
  flask db migrate -m "message"
 ```
-* roll back migration
+* Roll back migration
 ```
  flask db downgrade
 ```
-* create empty migration
+* Create empty migration
 ```
  flask db revision -m "message"
 ```
@@ -48,7 +48,7 @@ make user args="superman super@example.com p@ssword --admin"
 
 ## Development
 ### Pre-commit hooks
-* pip install pre-commit from requirements.txt
+* `pip install pre-commit`
 * `pre-commit install`
 * Done!
 

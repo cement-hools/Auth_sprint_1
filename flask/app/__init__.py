@@ -10,12 +10,24 @@ from app.settings.core import (
     flask_settings,
     redis_settings,
 )
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from werkzeug.middleware.proxy_fix import ProxyFix
 from app.settings.auth import jwt_settings
 from app.settings.oauth import OAuthYandexSettings, OAuthGoogleSettings
 from app.settings.logging import logger, InterceptHandler
 from .jaeger_app import jaeger
 
 oauth = OAuth()
+
+# Rate limiting
+limiter = Limiter(
+    get_remote_address,
+    storage_uri=redis_settings.dsn,
+    storage_options={"socket_connect_timeout": 30},
+    default_limits=[flask_settings.global_rate_limiting_option],
+    headers_enabled=True,
+)
 
 
 def create_app():
@@ -65,6 +77,13 @@ def create_app():
         server_metadata_url=OAuthGoogleSettings().CONF_URL,
         client_kwargs={"scope": OAuthGoogleSettings().scope},
     )
+
+    # App is behind one proxy (nginx) that sets the -For and host headers.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
+
+    # Rate limiting
+    app.config["RATELIMIT_STRATEGY"] = "fixed-window-elastic-expiry"
+    limiter.init_app(app)
 
     return app
 
