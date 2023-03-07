@@ -26,6 +26,8 @@ class FlaskSettings(BaseSettings):
     host: str = Field(default="0.0.0.0")
     port: int = Field(default=5000)
 
+    global_rate_limiting_option: str = "1000 per hour"
+
     class Config(PrimaryConfig):
         env_prefix = "FLASK_"
 
