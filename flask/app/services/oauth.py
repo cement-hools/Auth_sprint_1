@@ -2,13 +2,15 @@ import secrets
 import string
 
 from app.api.v1.oauth.schemas import yandex, google
-from app.services.schemas import ServiceResult
 from app.db import db
-from app.db.models import Role, SocialAccount
+from app.db.models import SocialAccount
 from app.db.models.user import User
 from app.services.auth import login, registration
-from app.settings.core import user_roles_settings
+from app.services.schemas import ServiceResult
 from app.settings.logging import logger
+
+
+SOCIAL_NAME = SocialAccount.SocialName
 
 
 def _create_random_alphanumeric_string():
@@ -19,7 +21,7 @@ def _create_random_alphanumeric_string():
 def _social_login_or_register(
     email: str,
     social_id: str,
-    social_name: str,
+    social_name: SOCIAL_NAME,
     social_login: str = None,
 ):
     social_account = SocialAccount.query.filter(
@@ -80,10 +82,11 @@ def _social_login_or_register(
 
 def login_yandex_user(account_user: yandex.User):
     """OAuth Яндекс пользователя."""
+    yandex_name = SOCIAL_NAME.YANDEX
     return _social_login_or_register(
         email=account_user.email,
         social_id=account_user.id,
-        social_name=account_user.social_name,
+        social_name=yandex_name,
         social_login=account_user.login,
     )
 
@@ -92,9 +95,9 @@ def login_google_user(token: google.Token):
     if not token.email_verified:
         error_message = "Need to verify email in Google first"
         return ServiceResult(success=False, error_message=error_message)
-
+    google_name = SOCIAL_NAME.GOOGLE
     return _social_login_or_register(
         email=token.email,
         social_id=token.sub,
-        social_name="google",
+        social_name=google_name,
     )

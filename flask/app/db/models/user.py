@@ -1,9 +1,10 @@
+import enum
 import uuid
 
-from app.db import db
 from flask_bcrypt import check_password_hash, generate_password_hash
-from sqlalchemy import UUID, UniqueConstraint
+from sqlalchemy import UUID, UniqueConstraint, Enum
 
+from app.db import db
 from .role import Role
 
 
@@ -64,6 +65,12 @@ class SocialAccount(db.Model):
         db.UniqueConstraint("social_id", "social_name", name="social_pk"),
     )
 
+    class SocialName(enum.Enum):
+        """Название социальной сети"""
+
+        YANDEX = "yandex"
+        GOOGLE = "google"
+
     id = db.Column(
         UUID(as_uuid=True),
         primary_key=True,
@@ -78,24 +85,31 @@ class SocialAccount(db.Model):
         User, backref=db.backref("social_accounts", lazy=True)
     )
     social_id = db.Column(db.String(128), nullable=False)
-    social_name = db.Column(db.String(128), nullable=False)
+    social_name = db.Column(
+        Enum(
+            SocialName,
+            name="social_name_type",
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
+        nullable=False,
+    )
 
     def __repr__(self):
         return f"<SocialAccount {self.social_name}:{self.user_id}>"
 
 
 def create_partition(target, connection, **kw) -> None:
-    """ creating partition by user_sign_in """
+    """creating partition by user_sign_in"""
     connection.execute(
-        """CREATE TABLE IF NOT EXISTS "login_history_in_tablet" 
+        """CREATE TABLE IF NOT EXISTS "login_history_in_tablet"    # noqa W291
         PARTITION OF "login_history" FOR VALUES IN ('tablet')"""
     )
     connection.execute(
-        """CREATE TABLE IF NOT EXISTS "login_history_in_mobile" 
+        """CREATE TABLE IF NOT EXISTS "login_history_in_mobile"    # noqa W291
         PARTITION OF "login_history" FOR VALUES IN ('mobile')"""
     )
     connection.execute(
-        """CREATE TABLE IF NOT EXISTS "login_history_in_web" 
+        """CREATE TABLE IF NOT EXISTS "login_history_in_web"       # noqa W291
         PARTITION OF "login_history" FOR VALUES IN ('web')"""
     )
 
@@ -105,15 +119,16 @@ class LoginHistory(db.Model):
 
     __tablename__ = "login_history"
     __table_args__ = (
-        UniqueConstraint('id', 'user_device_type'),
+        UniqueConstraint("id", "user_device_type"),
         {
-            'postgresql_partition_by': 'LIST (user_device_type)',
-            'listeners': [('after_create', create_partition)],
-        }
+            "postgresql_partition_by": "LIST (user_device_type)",
+            "listeners": [("after_create", create_partition)],
+        },
     )
 
     class DeviceType:
         """Тип устройства."""
+
         PC = "web"
         MOBILE = "mobile"
         TABLET = "tablet"
