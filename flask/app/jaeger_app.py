@@ -6,6 +6,8 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
+from app.settings.jaeger import jaeger_settings
+
 
 class JaegerManager:
     def __init__(
@@ -13,15 +15,18 @@ class JaegerManager:
         app: Flask = None,
         host: str | None = None,
         port: int | None = None,
+        is_active: bool = True,
     ) -> None:
         self.host = host or "localhost"
         self.port = port or 6831
+        self.is_active = is_active
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app: Flask) -> None:
-        self.configure_tracer()
-        FlaskInstrumentor().instrument_app(app)
+        if self.is_active:
+            self.configure_tracer()
+            FlaskInstrumentor().instrument_app(app)
 
     def configure_tracer(self) -> None:
         trace.set_tracer_provider(
@@ -39,4 +44,4 @@ class JaegerManager:
         )
 
 
-jaeger = JaegerManager()
+jaeger = JaegerManager(**jaeger_settings.dict())
